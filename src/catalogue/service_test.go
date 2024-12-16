@@ -5,13 +5,13 @@
 package catalogue
 
 import (
-	"os"
 	"reflect"
 	"strings"
 	"testing"
 
+	"github.com/go-kit/log"
+
 	"github.com/DATA-DOG/go-sqlmock"
-	"github.com/go-kit/kit/log"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -29,7 +29,6 @@ var (
 var logger log.Logger
 
 func TestCatalogueServiceList(t *testing.T) {
-	logger = log.NewLogfmtLogger(os.Stderr)
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening stub database connection", err)
@@ -108,7 +107,6 @@ func TestCatalogueServiceList(t *testing.T) {
 }
 
 func TestCatalogueServiceCount(t *testing.T) {
-	logger = log.NewLogfmtLogger(os.Stderr)
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening stub database connection", err)
@@ -146,7 +144,6 @@ func TestCatalogueServiceCount(t *testing.T) {
 }
 
 func TestCatalogueServiceGet(t *testing.T) {
-	logger = log.NewLogfmtLogger(os.Stderr)
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening stub database connection", err)
@@ -194,7 +191,6 @@ func TestCatalogueServiceGet(t *testing.T) {
 }
 
 func TestCatalogueServiceCategories(t *testing.T) {
-	logger = log.NewLogfmtLogger(os.Stderr)
 	db, mock, err := sqlmock.New()
 	if err != nil {
 		t.Fatalf("an error '%s' was not expected when opening stub database connection", err)

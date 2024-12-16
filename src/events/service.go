@@ -12,7 +12,7 @@ import (
 	"github.com/go-kit/kit/log"
 	"golang.org/x/net/context"
 
-	"github.com/oracle/oci-go-sdk/streaming"
+	"github.com/oracle/oci-go-sdk/v65/streaming"
 )
 
 // Middleware decorates a service.

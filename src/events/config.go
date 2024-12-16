@@ -7,23 +7,16 @@ package events
 import (
 	"os"
 
-	"github.com/oracle/oci-go-sdk/common"
-	"github.com/oracle/oci-go-sdk/streaming"
+	"github.com/oracle/oci-go-sdk/v65/common"
+	"github.com/oracle/oci-go-sdk/v65/common/auth"
+	"github.com/oracle/oci-go-sdk/v65/example/helpers"
+	"github.com/oracle/oci-go-sdk/v65/streaming"
 )
 
 // EnvironmentConfigurationProvider uses environment variables to get OCI config
 func EnvironmentConfigurationProvider() (common.ConfigurationProvider, error) {
-	pass := os.Getenv("PASSPHRASE")
-	provider := common.NewRawConfigurationProvider(
-		os.Getenv("TENANCY"),
-		os.Getenv("USER_ID"),
-		os.Getenv("REGION"),
-		os.Getenv("FINGERPRINT"),
-		os.Getenv("PRIVATE_KEY"),
-		&pass,
-	)
-	_, err := common.IsConfigurationProviderValid(provider)
-
+	provider, err := auth.InstancePrincipalConfigurationProvider()
+	helpers.FatalIfError(err)
 	return provider, err
 }
 

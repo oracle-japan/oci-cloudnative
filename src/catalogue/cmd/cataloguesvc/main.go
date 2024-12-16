@@ -1,7 +1,7 @@
 /*
 ** Copyright © 2020, Oracle and/or its affiliates. All rights reserved.
 ** Licensed under the Universal Permissive License v 1.0 as shown at http://oss.oracle.com/licenses/upl.
-*/
+ */
 
 package main
 
@@ -13,21 +13,24 @@ import (
 	"strings"
 	"syscall"
 
-	"github.com/go-kit/kit/log"
-	stdopentracing "github.com/opentracing/opentracing-go"
-	zipkin "github.com/openzipkin-contrib/zipkin-go-opentracing"
-
 	"net"
 	"net/http"
+
+	"github.com/go-kit/log"
+
+	stdopentracing "github.com/opentracing/opentracing-go"
+	zipkinot "github.com/openzipkin-contrib/zipkin-go-opentracing"
+	"github.com/openzipkin/zipkin-go"
+	zipkinhttp "github.com/openzipkin/zipkin-go/reporter/http"
 
 	"path/filepath"
 
 	"mushop/catalogue"
 
+	_ "github.com/godror/godror"
 	"github.com/jmoiron/sqlx"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/weaveworks/common/middleware"
-	_ "github.com/godror/godror"
 )
 
 const (
@@ -68,10 +71,6 @@ func main() {
 
 	// Log domain.
 	var logger log.Logger
-	{
-		logger = log.NewLogfmtLogger(os.Stderr)
-		logger = log.With(logger, "ts", log.DefaultTimestampUTC, "caller", log.DefaultCaller)
-	}
 
 	var tracer stdopentracing.Tracer
 	{
@@ -87,25 +86,18 @@ func main() {
 			localAddr := conn.LocalAddr().(*net.UDPAddr)
 			host := strings.Split(localAddr.String(), ":")[0]
 			defer conn.Close()
-			logger := log.With(logger, "tracer", "Zipkin")
 			logger.Log("addr", zip)
-			collector, err := zipkin.NewHTTPCollector(
-				*zip,
-				zipkin.HTTPLogger(logger),
-			)
+			reporter := zipkinhttp.NewReporter("http://localhot:9411/api/v2/spans")
+			defer reporter.Close()
+			endpoint, err := zipkin.NewEndpoint(ServiceName, host)
+			nativeTracer, err := zipkin.NewTracer(reporter, zipkin.WithLocalEndpoint(endpoint))
 			if err != nil {
 				logger.Log("err", err)
 				os.Exit(1)
 			}
-			tracer, err = zipkin.NewTracer(
-				zipkin.NewRecorder(collector, false, fmt.Sprintf("%v:%v", host, port), ServiceName),
-			)
-			if err != nil {
-				logger.Log("err", err)
-				os.Exit(1)
-			}
+			tracer = zipkinot.Wrap(nativeTracer)
 		}
-		stdopentracing.InitGlobalTracer(tracer)
+		stdopentracing.SetGlobalTracer(tracer)
 	}
 
 	// Data domain.
@@ -163,8 +155,8 @@ func main() {
 
 // Reads an environment variable value and returns a default value if environment variable does not exist
 func getEnv(key string, defaultVal string) string {
-    if value, exists := os.LookupEnv(key); exists {
+	if value, exists := os.LookupEnv(key); exists {
 		return value
-    }
-    return defaultVal
+	}
+	return defaultVal
 }

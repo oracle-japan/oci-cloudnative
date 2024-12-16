@@ -4,13 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 
 	"github.com/go-kit/kit/circuitbreaker"
-	"github.com/go-kit/kit/log"
 	"github.com/go-kit/kit/tracing/opentracing"
 	httptransport "github.com/go-kit/kit/transport/http"
+	"github.com/go-kit/log"
 	"github.com/gorilla/mux"
 	stdopentracing "github.com/opentracing/opentracing-go"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
@@ -18,7 +18,7 @@ import (
 	"golang.org/x/net/context"
 )
 
-//hello
+// hello
 // MakeHTTPHandler mounts the endpoints into a REST-y HTTP handler.
 func MakeHTTPHandler(ctx context.Context, e Endpoints, logger log.Logger, tracer stdopentracing.Tracer) *mux.Router {
 	r := mux.NewRouter().StrictSlash(false)
@@ -59,7 +59,7 @@ func decodeAuthoriseRequest(_ context.Context, r *http.Request) (interface{}, er
 	var bodyBytes []byte
 	if r.Body != nil {
 		var err error
-		bodyBytes, err = ioutil.ReadAll(r.Body)
+		bodyBytes, err = io.ReadAll(r.Body)
 		if err != nil {
 			return nil, err
 		}
