@@ -17,6 +17,8 @@ spec:
         name: carts
         app.kubernetes.io/name: carts
       annotations:
+        instrumentation.opentelemetry.io/inject-java: mushop/inst-apm-java
+        #instrumentation.opentelemetry.io/inject-java: "true"
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
         prometheus.io/scrape: "true"
         prometheus.io/path: /metrics
