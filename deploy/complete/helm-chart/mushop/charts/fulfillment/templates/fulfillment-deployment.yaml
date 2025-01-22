@@ -10,7 +10,6 @@ spec:
     matchLabels:
       app: {{ .Chart.Name }}
       app.kubernetes.io/name: {{ include "fulfillment.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
       run: {{ include "fulfillment.name" . }}
   template:
     metadata:
@@ -18,13 +17,17 @@ spec:
         app: {{ .Chart.Name }}
         version: {{ .Values.image.tag | quote }}
         app.kubernetes.io/name: {{ include "fulfillment.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
         run: {{ include "fulfillment.name" . }}
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
         prometheus.io/scrape: "true"
         prometheus.io/path: /prometheus
         prometheus.io/port: "80"
+        {{ if eq .Values.opentelemetry.provider "oci" }}
+          instrumentation.opentelemetry.io/inject-java: "mushop/inst-apm-java"
+        {{ else }}
+          instrumentation.opentelemetry.io/inject-java: "true"
+        {{ end }}
     spec:
       containers:
         - name: {{ .Chart.Name }}

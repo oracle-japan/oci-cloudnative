@@ -13,7 +13,6 @@ spec:
         sidecar.istio.io/inject: "false"
       labels:
         app.kubernetes.io/name: {{ include "orders.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       restartPolicy: Never
       initContainers:

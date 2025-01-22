@@ -1,5 +1,0 @@
-apiVersion: v1
-name: nats
-appVersion: 2.7.1
-version: 0.1.1
-description: Helm chart for NATS.io, the messaging component of MuShop

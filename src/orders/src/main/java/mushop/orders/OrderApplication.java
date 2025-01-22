@@ -13,6 +13,13 @@ import org.springframework.scheduling.annotation.EnableAsync;
 public class OrderApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(OrderApplication.class, args);
+        Thread.setDefaultUncaughtExceptionHandler((thread, throwable) -> {
+            System.err.println("Uncaught exception in thread " + thread.getName());
+            throwable.printStackTrace();
+        });
+        
+        SpringApplication app = new SpringApplication(OrderApplication.class);
+        app.setRegisterShutdownHook(true);
+        app.run(args);
     }
 }

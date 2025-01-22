@@ -12,7 +12,6 @@ spec:
         sidecar.istio.io/inject: "false"
       labels:
         app.kubernetes.io/name: {{ include "assets.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
     spec:
       restartPolicy: Never
       containers:

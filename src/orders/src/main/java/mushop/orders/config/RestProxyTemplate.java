@@ -13,7 +13,7 @@ import org.springframework.web.client.RestTemplate;
 import org.springframework.context.annotation.Bean;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.net.InetSocketAddress;
 import java.net.Proxy;
 
@@ -21,12 +21,7 @@ import java.net.Proxy;
 public final class RestProxyTemplate {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
-    @Autowired RestTemplate restTemplate;
-
-    @Bean
-    public RestTemplate restTemplate() {
-      return new RestTemplate();
-    }
+    private RestTemplate restTemplate;  
 
     @Value("${proxy.host:}")
     private String host;
@@ -34,23 +29,33 @@ public final class RestProxyTemplate {
     @Value("${proxy.port:}")
     private String port;
 
-    @PostConstruct
-    public void init() {
-        if (host.isEmpty() || port.isEmpty()) {
-            return;
-        }
-        int portNr = -1;
-        try {
-            portNr = Integer.parseInt(port);
-        } catch (NumberFormatException e) {
-            logger.error("Unable to parse the proxy port number");
-        }
-        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
-        InetSocketAddress address = new InetSocketAddress(host, portNr);
-        Proxy proxy = new Proxy(Proxy.Type.HTTP, address);
-        factory.setProxy(proxy);
+    public RestProxyTemplate() {
+        this.restTemplate = new RestTemplate();
+    }
 
-        restTemplate.setRequestFactory(factory);
+    @Bean
+    public RestTemplate restTemplate() {
+        RestTemplate template = new RestTemplate();
+        
+        if (!host.isEmpty() && !port.isEmpty()) {
+            int portNr = -1;
+            try {
+                portNr = Integer.parseInt(port);
+            } catch (NumberFormatException e) {
+                logger.error("Unable to parse the proxy port number");
+                return template;
+            }
+            
+            SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+            InetSocketAddress address = new InetSocketAddress(host, portNr);
+            Proxy proxy = new Proxy(Proxy.Type.HTTP, address);
+            factory.setProxy(proxy);
+            
+            template.setRequestFactory(factory);
+        }
+        
+        this.restTemplate = template;  
+        return template;
     }
 
     public RestTemplate getRestTemplate() {

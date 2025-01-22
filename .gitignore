@@ -1,5 +1,6 @@
 # Generic
 .DS_Store
+.vscode
 *.tgz
 *.zip
 .dccache

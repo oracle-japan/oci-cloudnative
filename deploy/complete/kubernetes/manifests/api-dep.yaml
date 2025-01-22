@@ -2,7 +2,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: api
+  name: mushop-api
   labels:
     name: api
     app.kubernetes.io/name: api
@@ -11,36 +11,35 @@ spec:
   replicas: 1
   selector:
     matchLabels:
-      app: api
+      name: api
       app.kubernetes.io/name: api
   template:
     metadata:
       labels:
         name: api
         layer: client
-        version: "2.2.1"
         app.kubernetes.io/name: api
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
     spec:
       containers:
       - name: api
-        image: "iad.ocir.io/oracle/ateam/mushop-api:2.2.1"
-        imagePullPolicy: IfNotPresent
+        image: "nrt.ocir.io/orasejapan/mushop-api"
+        imagePullPolicy: Always
         ports:
         - name: http
           containerPort: 3000
         env:
         - name: SESSION_REDIS
-          value: session
+          value: aaassl65iqa5zdxhoid2th6rgncjiawkpkrcrm4ets2qwlj22rviz3a-p.redis.uk-london-1.oci.oraclecloud.com
         - name: CATALOGUE_URL
-          value: http://catalogue
+          value: http://mushop-catalogue
         - name: ORDERS_URL
-          value: http://orders
+          value: http://mushop-orders
         - name: CARTS_URL
-          value: http://carts
+          value: http://mushop-carts
         - name: USERS_URL
-          value: http://user
+          value: http://mushop-user
         - name: EVENTS_URL
           value: http://mushop-events
         - name: STATIC_MEDIA_URL

@@ -6,7 +6,6 @@ metadata:
 spec:
   selector:
     app.kubernetes.io/name: {{ include "fulfillment.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
     run: {{ include "fulfillment.name" . }}
   ports:
     - port: {{ .Values.service.port }}

@@ -6,7 +6,6 @@ metadata:
 spec:
   selector:
     app.kubernetes.io/name: {{ include "user.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
   ports:
     - port: {{ .Values.service.port }}
       name: http

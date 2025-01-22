@@ -9,8 +9,7 @@ import org.springframework.data.annotation.CreatedDate;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import javax.annotation.Generated;
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 
 

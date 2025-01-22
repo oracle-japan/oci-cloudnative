@@ -16,8 +16,11 @@ import org.springframework.boot.jdbc.metadata.HikariDataSourcePoolMetadata;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 import javax.sql.DataSource;
+import java.util.Properties;
 
 @Configuration
 public class DataSourceConfiguration {
@@ -54,5 +57,29 @@ public class DataSourceConfiguration {
         DataSourcePoolMetadataProvider provider = dataSource -> new HikariDataSourcePoolMetadata((HikariDataSource) dataSource);
         new DataSourcePoolMetrics(ordersDS,provider,"orders_data_source",null).bindTo(registry);
         return ordersDS;
+    }
+
+
+    @Bean
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(DataSource dataSource) {
+        LocalContainerEntityManagerFactoryBean em = new LocalContainerEntityManagerFactoryBean();
+        em.setDataSource(dataSource);
+        em.setPackagesToScan("mushop.orders"); // エンティティクラスのパッケージを指定
+
+        HibernateJpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
+        em.setJpaVendorAdapter(vendorAdapter);
+
+        Properties properties = new Properties();
+        // Dialectの設定を削除（H2の場合のみ設定）
+        if ("Mock".equalsIgnoreCase(db_Name)) {
+            properties.setProperty("hibernate.dialect", "org.hibernate.dialect.H2Dialect");
+        }
+        properties.setProperty("hibernate.hbm2ddl.auto", "update");
+        em.setJpaProperties(properties);
+
+        // エンティティマネージャーファクトリーのインターフェースを明示的に設定
+        em.setEntityManagerFactoryInterface(jakarta.persistence.EntityManagerFactory.class);
+
+        return em;
     }
 }

@@ -11,7 +11,7 @@ metrics-server:
 # https://github.com/prometheus-community/helm-charts/blob/main/charts/prometheus/README.md
 # https://artifacthub.io/packages/helm/prometheus-community/prometheus
 prometheus:
-  enabled: true
+  enabled: false
   extraScrapeConfigs: |
     - job_name: 'ingress-nginx'
       metrics_path: /metrics
@@ -47,7 +47,7 @@ cert-manager:
 # https://github.com/grafana/helm-charts/blob/main/charts/grafana/README.md
 # https://artifacthub.io/packages/helm/grafana/grafana
 grafana:
-  enabled: true
+  enabled: false
   dashboards:
     default:
       k8s-cluster:

@@ -4,14 +4,15 @@
  **/
 package  mushop;
 
-import io.micronaut.core.annotation.TypeHint;
 import io.micronaut.runtime.Micronaut;
-import io.nats.client.impl.SocketDataPort;
+import jakarta.inject.Singleton;
 
-@TypeHint(value = {SocketDataPort.class}, accessType = TypeHint.AccessType.ALL_DECLARED_CONSTRUCTORS)
+@Singleton
 public class Application {
-
-    public static void main(String[] args) {
-        Micronaut.run(Application.class);
+        public static void main(String[] args) {
+            Micronaut.build(args)
+            .packages("mushop")  // 明示的にパッケージを指定
+            .mainClass(Application.class)
+            .start();
+        }
     }
-}

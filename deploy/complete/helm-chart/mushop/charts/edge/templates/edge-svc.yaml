@@ -9,7 +9,6 @@ spec:
   type: {{ .Values.service.type }}
   selector:
     app.kubernetes.io/name: {{ include "edge-router.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
   ports:
     - port: {{ .Values.service.port }}
       name: http

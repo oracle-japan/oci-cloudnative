@@ -1,16 +1,15 @@
-import org.gradle.api.tasks.testing.logging.TestExceptionFormat
-import org.gradle.api.tasks.testing.logging.TestLogEvent
-
 plugins {
-  id("org.springframework.boot") version "3.4.0"
-  id 'io.spring.dependency-management' version '1.1.6'
+  id("org.springframework.boot") version "3.2.2"
+  id("com.github.johnrengelman.shadow") version "8.1.1"
+  id 'io.spring.dependency-management' version '1.1.7'
   id 'java'
 }
 
 
 group = 'mushop.orders'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
+sourceCompatibility = '21'
+targetCompatibility = '21'
 
 configurations {
   compileOnly {
@@ -35,8 +34,18 @@ dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-jetty'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-actuator'
-  implementation 'io.nats:jnats:2.6.6'
-  implementation 'com.h2database:h2:1.4.200'
+  implementation 'jakarta.persistence:jakarta.persistence-api:3.1.0'
+  implementation 'org.springframework.kafka:spring-kafka:3.0.12'
+  implementation 'io.opentelemetry:opentelemetry-api:1.43.0'
+  implementation 'io.opentelemetry:opentelemetry-sdk:1.43.0'
+  implementation 'io.opentelemetry:opentelemetry-sdk-common:1.45.0'
+  implementation 'io.opentelemetry:opentelemetry-semconv:1.21.0-alpha'
+  implementation 'io.opentelemetry:opentelemetry-extension-trace-propagators:1.43.0'
+  implementation 'io.opentelemetry.instrumentation:opentelemetry-kafka-clients-2.6:2.11.0-alpha'
+  implementation 'org.apache.kafka:kafka-clients'
+  implementation 'org.hibernate:hibernate-core:6.6.4.Final'
+  implementation 'com.h2database:h2:2.2.224'
+  runtimeOnly 'io.opentelemetry.instrumentation:opentelemetry-spring-kafka-2.7:2.0.0-alpha'
   runtimeOnly 'com.oracle.database.jdbc:ojdbc8:19.6.0.0'
   runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
@@ -46,31 +55,6 @@ dependencies {
 
   testImplementation 'com.openpojo:openpojo:0.8.12'
 
-}
-
-test {
-  useJUnitPlatform()
-}
-
-tasks.withType(Test) {
-  testLogging {
-    // set options for log level LIFECYCLE
-    events TestLogEvent.FAILED,
-        TestLogEvent.PASSED,
-        TestLogEvent.SKIPPED
-    exceptionFormat TestExceptionFormat.FULL
-    showExceptions true
-    showCauses true
-    showStackTraces true
-    afterSuite { desc, result ->
-      if (!desc.parent) { // will match the outermost suite
-        def output = "Results: ${result.resultType} (${result.testCount} tests, ${result.successfulTestCount} passed, ${result.failedTestCount} failed, ${result.skippedTestCount} skipped)"
-        def startItem = '|  ', endItem = '  |'
-        def repeatLength = startItem.length() + output.length() + endItem.length()
-        println('\n' + ('-' * repeatLength) + '\n' + startItem + output + endItem + '\n' + ('-' * repeatLength))
-      }
-    }
-  }
 }
 
 

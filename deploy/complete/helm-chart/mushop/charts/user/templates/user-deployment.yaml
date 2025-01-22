@@ -9,14 +9,12 @@ spec:
     matchLabels:
       app: {{ .Chart.Name }}
       app.kubernetes.io/name: {{ include "user.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
   template:
     metadata:
       labels:
         app: {{ .Chart.Name }}
         version: {{ .Values.image.tag | quote }}
         app.kubernetes.io/name: {{ include "user.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
         mockmode: {{ .Values.global.mock.service | quote }}
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"

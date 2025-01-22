@@ -2,7 +2,13 @@ package mushop.orders.services;
 
 import io.micrometer.core.instrument.DistributionSummary;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.opentelemetry.api.GlobalOpenTelemetry;
+import io.opentelemetry.api.trace.Span;
+import io.opentelemetry.api.trace.Tracer;
+import io.opentelemetry.context.Scope;
 import mushop.orders.config.OrdersConfigurationProperties;
+import mushop.orders.controllers.OrdersController.OrderFailedException;
+import mushop.orders.controllers.OrdersController.PaymentDeclinedException;
 import mushop.orders.entities.*;
 import mushop.orders.repositories.CustomerOrderRepository;
 import mushop.orders.resources.NewOrderResource;

@@ -3,7 +3,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fulfillment
+  name: mushop-fulfillment
   labels:
     app.kubernetes.io/name: fulfillment
     helm.sh/chart: fulfillment-0.1.0
@@ -17,7 +17,6 @@ spec:
     matchLabels:
       app: fulfillment
       app.kubernetes.io/name: fulfillment
-      app.kubernetes.io/instance: mushop
       run: fulfillment
   template:
     metadata:
@@ -25,29 +24,37 @@ spec:
         app: fulfillment
         version: "1.1.0"
         app.kubernetes.io/name: fulfillment
-        app.kubernetes.io/instance: mushop
         run: fulfillment
       annotations:
         sidecar.istio.io/rewriteAppHTTPProbers: "true"
         prometheus.io/scrape: "true"
         prometheus.io/path: /prometheus
         prometheus.io/port: "80"
+        instrumentation.opentelemetry.io/inject-java: "mushop/inst-apm-java"
+        #instrumentation.opentelemetry.io/inject-java: "true"
     spec:
       containers:
         - name: fulfillment
-          image: "iad.ocir.io/oracle/ateam/mushop-fulfillment:1.1.0"
-          imagePullPolicy: IfNotPresent
+          #image: "iad.ocir.io/oracle/ateam/mushop-fulfillment:1.1.0"
+          image: "nrt.ocir.io/orasejapan/mushop-fulfillment"
+          imagePullPolicy: Always
           ports:
             - name: http
               containerPort: 80
           env:
-            - name: NATS_HOST
-              value: "nats"
-            - name: NATS_PORT
-              value: "4222"
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-compati-secret
+                  key: server
+            - name: KAFKA_CONFIG
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-compati-secret
+                  key: sasl-jaas-config
             - name: ORDERS_NEW
-              value: "orders"
+              value: "mushop-orders"
             - name: ORDERS_SHIPPED
-              value: "shipments"
+              value: "mushop-shipments"
             - name: SIMULATION_DELAY
               value: "10000"
