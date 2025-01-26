@@ -21,6 +21,11 @@ spec:
         prometheus.io/scrape: "true"
         prometheus.io/path: /actuator/prometheus
         prometheus.io/port: "80"
+        {{ if eq .Values.opentelemetry.provider "oci" }}
+          instrumentation.opentelemetry.io/inject-java: "mushop/inst-apm-java"
+        {{ else }}
+          instrumentation.opentelemetry.io/inject-java: "true"
+        {{ end }}
     spec:
       initContainers:
         {{- include "orders.init.wallet" . | nindent 8 }}
@@ -46,6 +51,49 @@ spec:
               port: http
 
           env:
+            - name: KAFKA_BOOTSTRAP_SERVERS
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-compati-secret
+                  key: server
+            - name: KAFKA_CONFIG
+              valueFrom:
+                secretKeyRef:
+                  name: kafka-compati-secret
+                  key: sasl-jaas-config
+            {{ if eq .Values.opentelemetry.provider "oci" }}
+              - name: OTEL_com_oracle_apm_agent_private_data_key
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Values.opentelemetry.secret }}"
+                    key: "{{ .Values.opentelemetry.endpoint }}"
+              - name: OTEL_com_oracle_apm_agent_data_upload_endpoint
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Values.opentelemetry.secret }}"
+                    key: "{{ .Values.opentelemetry.key }}"
+            {{ else }}
+              - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Values.opentelemetry.otel.secret }}"
+                    key: "{{ .Values.opentelemetry.otel.endpoint }}"
+              - name: OTEL_EXPORTER_OTLP_TRACES_PROTOCOL
+                value: http/protobuf
+              - name: OTEL_EXPORTER_OTLP_HEADERS
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Values.opentelemetry.otel.secret }}"
+                    key: "{{ .Values.opentelemetry.otel.oltp.headers }}"
+              - name: OTEL_EXPORTER_OTLP_TRACES_HEADERS
+                valueFrom:
+                  secretKeyRef:
+                    name: "{{ .Values.opentelemetry.otel.secret }}"
+                    key: "{{ .Values.opentelemetry.otel.oltp.traceHeaders }}"
+            - name: ORDERS_NEW
+              value: "{{ .Values.env.newOrdersSubject }}"
+            - name: ORDERS_SHIPPED
+              value: "{{ .Values.env.shippedOrdersSubject }}"
             - name: ZIPKIN
               value: {{ .Values.env.zipkin }}
             - name: JAVA_OPTS
@@ -54,10 +102,6 @@ spec:
               value: "{{ .Release.Name }}-{{ .Values.env.natsHost }}"
             - name: NATS_PORT
               value: "{{ .Values.env.natsPort }}"
-            - name: ORDERS_NEW
-              value: "{{ .Values.env.newOrdersSubject }}"
-            - name: ORDERS_SHIPPED
-              value: "{{ .Values.env.shippedOrdersSubject }}"
             {{- include "orders.oadb.connection" . | nindent 12 }}
           volumeMounts:
             - mountPath: /tmp

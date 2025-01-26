@@ -50,7 +50,17 @@ spec:
           valueFrom:
             secretKeyRef:
               name: carts-oadb-connection
-              key: oadb_service   
+              key: oadb_service 
+        - name: OTEL_com_oracle_apm_agent_private_data_key
+          valueFrom:
+            secretKeyRef:
+              name: apm-secret
+              key: endpoint
+        - name: OTEL_com_oracle_apm_agent_data_upload_endpoint
+          valueFrom:
+            secretKeyRef:
+              name: apm-secret
+              key: credentials
         volumeMounts:
         - mountPath: /tmp
           name: tmp-volume

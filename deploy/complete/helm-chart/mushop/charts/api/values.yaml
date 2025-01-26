@@ -1,9 +1,9 @@
 replicaCount: 1
 
 image:
-  repository: iad.ocir.io/oracle/ateam/mushop-api
-  tag: 2.3.2
-  pullPolicy: IfNotPresent
+  repository: nrt.ocir.io/orasejapan/mushop-aps
+  tag: latest
+  pullPolicy: Always
 
 env:
   mediaUrl: /assets

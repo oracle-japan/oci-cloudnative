@@ -1,18 +1,29 @@
 replicaCount: 1
 
 image:
-  repository: iad.ocir.io/oracle/ateam/mushop-fulfillment
-  tag: 1.1.0
-  pullPolicy: IfNotPresent
+  repository: nrt.ocir.io/orasejapan/mushop-fulfillment
+  tag: latest
+  pullPolicy: Always
 
 osb: {}
 
 env:
-  natsHost: "nats"
-  natsPort: 4222
   newOrdersSubject: mushop-orders
   shippedOrdersSubject: mushop-shipments
   simulationDelay: 10000
 
 service:
   port: 80
+
+opentelemetry:
+  provider: oci
+  oci:
+    secret: apm-secret
+    endpoint: endpoint
+    key: credentials
+  otel:
+    secret: otel-secret
+    endpoint: 
+    oltp:
+      headers:
+      traceHeaders:

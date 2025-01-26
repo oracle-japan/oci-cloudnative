@@ -3,12 +3,12 @@ replicaCount: 1
 image:
   repository: iad.ocir.io/oracle/ateam/mushop-carts
   tag: 1.5.0
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 dbtools:
   repository: iad.ocir.io/oracle/ateam/mushop-dbtools
   tag: 1.0.1
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 osb: {}
 
@@ -24,3 +24,16 @@ env:
 
 service:
   port: 80
+
+opentelemetry:
+  provider: oci
+  oci:
+    secret: apm-secret
+    endpoint: endpoint
+    key: credentials
+  otel:
+    secret: otel-secret
+    endpoint: 
+    oltp:
+      headers:
+      traceHeaders:

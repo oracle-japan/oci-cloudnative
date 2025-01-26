@@ -1,14 +1,14 @@
 replicaCount: 1
 
 image:
-  repository: iad.ocir.io/oracle/ateam/mushop-orders
-  tag: 2.2.2
-  pullPolicy: IfNotPresent
+  repository: nrt.ocir.io/orasejapan/mushop-order
+  tag: latest
+  pullPolicy: Always
 
 dbtools:
   repository: iad.ocir.io/oracle/ateam/mushop-dbtools
   tag: 1.0.1
-  pullPolicy: IfNotPresent
+  pullPolicy: Always
 
 osb: {}
 
@@ -21,9 +21,20 @@ secrets:
 env:
   zipkin: zipkin.jaeger.svc.cluster.local
   javaOpts: -Xms32m -Xmx150m -XX:MaxRAM=150m -Djava.security.egd=file:/dev/urandom -Doracle.jdbc.fanEnabled=false -XX:+UnlockExperimentalVMOptions -XX:+UseZGC -Dlogging.level.mushop.orders=INFO -Dspring.zipkin.enabled=false
-  natsHost: "nats"
-  natsPort: 4222
   newOrdersSubject: mushop-orders
   shippedOrdersSubject: mushop-shipments
 service:
   port: 80
+
+opentelemetry:
+  provider: oci
+  oci:
+    secret: apm-secret
+    endpoint: endpoint
+    key: credentials
+  otel:
+    secret: otel-secret
+    endpoint: 
+    oltp:
+      headers:
+      traceHeaders:

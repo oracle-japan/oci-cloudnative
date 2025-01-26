@@ -58,3 +58,13 @@ spec:
               value: "mushop-shipments"
             - name: SIMULATION_DELAY
               value: "10000"
+            - name: OTEL_com_oracle_apm_agent_private_data_key
+              valueFrom:
+                secretKeyRef:
+                  name: apm-secret
+                  key: endpoint
+            - name: OTEL_com_oracle_apm_agent_data_upload_endpoint
+              valueFrom:
+                secretKeyRef:
+                  name: apm-secret
+                  key: credentials
