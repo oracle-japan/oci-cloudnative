@@ -15,15 +15,10 @@ env:
 service:
   port: 80
 
+streaming:
+  secret: kafka-secret
+  serverKey: server
+  configKey: config
+
 opentelemetry:
   provider: oci
-  oci:
-    secret: apm-secret
-    endpoint: endpoint
-    key: credentials
-  otel:
-    secret: otel-secret
-    endpoint: 
-    oltp:
-      headers:
-      traceHeaders:

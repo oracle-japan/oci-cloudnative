@@ -27,10 +27,13 @@ spec:
             - name: http
               containerPort: 3000
           env:
+          - name: SESSION_REDIS
+            valueFrom:
+              secretKeyRef:
+                name: "{{ .Values.cache.secret}}"
+                key: "{{ .Values.cache.hostKey }}"
           - name: MOCK_MODE
             value: "{{ .Values.global.mock.service }}"
-          - name: SESSION_REDIS
-            value: {{ .Release.Name }}-session
           - name: CATALOGUE_URL
             value: http://{{ .Release.Name }}-catalogue
           - name: ORDERS_URL
@@ -39,8 +42,6 @@ spec:
             value: http://{{ .Release.Name }}-carts
           - name: USERS_URL
             value: http://{{ .Release.Name }}-user
-          - name: EVENTS_URL
-            value: http://{{ .Release.Name }}-events
           - name: STATIC_MEDIA_URL
             value: {{ .Values.env.mediaUrl }}
           - name: NEWSLETTER_SUBSCRIBE_URL

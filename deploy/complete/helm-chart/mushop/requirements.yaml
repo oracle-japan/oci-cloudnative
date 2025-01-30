@@ -16,10 +16,6 @@ dependencies:
   - name: edge
     version: 0.2.1
     condition: edge.enabled
-  - name: events
-    version: 0.2.1
-    tags:
-      - streaming
   - name: orders
     version: 0.1.1
     tags:
@@ -27,9 +23,6 @@ dependencies:
   - name: payment
     version: 0.2.1
     condition: payment.enabled
-  - name: session
-    version: 0.2.1
-    condition: session.enabled
   - name: storefront
     version: 0.2.1
     condition: storefront.enabled
@@ -40,6 +33,3 @@ dependencies:
   - name: fulfillment
     version: 0.1.1
     condition: fulfillment.enabled
-  - name: nats
-    version: 0.1.1
-    condition: nats.enabled

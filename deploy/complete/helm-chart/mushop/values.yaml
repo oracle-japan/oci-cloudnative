@@ -3,13 +3,11 @@ global:
     service: "false"
   osb:
     instanceName: mushop
-  ociAuthSecret:
-  ossStreamSecret:
-  oadbService:
-  oadbAdminSecret:
-  oadbWalletSecret:
-  oadbConnectionSecret:
-  oosBucketSecret:
+  ociAuthSecret: oci-credentials
+  oadbAdminSecret: oadb-admin
+  oadbWalletSecret: oadb-wallet
+  oadbConnectionSecret: oadb-connection
+  oosBucketSecret: oos-bucket
   okeVirtualNodesSupport: false
 
 # Depending on the scenario, certain resources might need to be skipped.
@@ -45,27 +43,11 @@ orders:
 payment:
   enabled: true
 
-session:
-  enabled: true
-
 storefront:
   enabled: true
 
 fulfillment:
   enabled: true
 
-nats:
-  enabled: true
-
 user:
   enabled: true
-
-secrets:
-  streams:
-    streamId:
-    messageEndpoint:
-  bucket:
-    region:
-    name:
-    namespace:
-    par:

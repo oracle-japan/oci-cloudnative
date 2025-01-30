@@ -27,13 +27,3 @@ service:
 
 opentelemetry:
   provider: oci
-  oci:
-    secret: apm-secret
-    endpoint: endpoint
-    key: credentials
-  otel:
-    secret: otel-secret
-    endpoint: 
-    oltp:
-      headers:
-      traceHeaders:

@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: nrt.ocir.io/orasejapan/mushop-aps
+  repository: nrt.ocir.io/orasejapan/mushop-api
   tag: latest
   pullPolicy: Always
 
@@ -40,3 +40,7 @@ hpa:
           averageUtilization: 70
 service:
   port: 80
+
+cache:
+  secret: cache-endpoint
+  hostKey: host
