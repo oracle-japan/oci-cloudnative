@@ -38,11 +38,11 @@ kubectl create secret generic oci-credentials \
   --from-literal=passphrase="" \
   --from-file=privatekey=private.pem
 
-kubectl create secret generic oadb-admin --from-literal=oadb_admin_pw='Dear05240301' -n mushop
+kubectl create secret generic oadb-admin --from-literal=oadb_admin_pw='xxxxxxx' -n mushop
 
 kubectl create secret generic oadb-wallet -n mushop --from-file=wallet
 
-kubectl create secret generic kafka-secret -n mushop --from-literal=server=cell-1.streaming.us-sanjose-1.oci.oraclecloud.com:9092 --from-literal=config='org.apache.kafka.common.security.plain.PlainLoginModule required username="xxxxxxxxxx/oracleidentitycloudservice/xxxxxxxx@oracle.com/ocid1.streampool.oc1.us-sanjose-1.amaaaaaassl65iqxxxxxxxxxxxxxokhibpnjyxwgpq3qvm3wa" password="GA:qffZry3v)iF_NxGQ3";'
+kubectl create secret generic kafka-secret -n mushop --from-literal=server=cell-1.streaming.us-sanjose-1.oci.oraclecloud.com:9092 --from-literal=config='org.apache.kafka.common.security.plain.PlainLoginModule required username="xxxxxxxxxx/oracleidentitycloudservice/xxxxxxxx@oracle.com/ocid1.streampool.oc1.us-sanjose-1.amaaaaaassl65iqxxxxxxxxxxxxxokhibpnjyxwgpq3qvm3wa" password="GA:qfxxxxxxxGQ3";'
 
 kubectl create secret generic oos-bucket \
   --namespace mushop \
