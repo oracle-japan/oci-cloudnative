@@ -3,16 +3,6 @@
 # 
 
 dependencies:
-  # Prometheus
-  - name: prometheus
-    version: 25.27.0
-    condition: prometheus.enabled
-    repository: https://prometheus-community.github.io/helm-charts
-  # Grafana
-  - name: grafana
-    version: 8.5.1
-    condition: grafana.enabled
-    repository: https://grafana.github.io/helm-charts
   # HPA Metrics
   - name: metrics-server
     version: 3.12.1
@@ -28,8 +18,3 @@ dependencies:
     version: 1.15.3
     condition: cert-manager.enabled
     repository: https://charts.jetstack.io
-  # jenkins
-  - name: jenkins
-    version: 4.3.23
-    condition: jenkins.enabled
-    repository: https://charts.jenkins.io

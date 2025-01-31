@@ -15,17 +15,17 @@ spec:
     image: container-registry.oracle.com/oci_observability_management/oci-apm-java-agent
     env:
       # - name: OTEL_EXPORTER_OTLP_TRACES_ENDPOINT
-      #   value: https://aaaaddhwxvhc2aaaaaaaaacxwm.apm-agt.us-ashburn-1.oci.oraclecloud.com/20200101/opentelemetry/private/v1/traces
+      #   value: https://aaaadfxxxxxxxxaaaaac57y.apm-agt.us-ashburn-1.oci.oraclecloud.com/20200101/opentelemetry/private/v1/traces
       # - name: OTEL_EXPORTER_OTLP_TRACES_PROTOCOL
       #   value: http/protobuf
       # - name: OTEL_EXPORTER_OTLP_HEADERS
-      #   value: Authorization=dataKey UTPWZYWS22NJWQYUCEJKSCXPNJJKKFJK
+      #   value: Authorization=dataKey RNAS5K65TUXXXXXXXXKOYBC4DSCZF
       # - name: OTEL_EXPORTER_OTLP_TRACES_HEADERS
-      #   value: Authorization=dataKey UTPWZYWS22NJWQYUCEJKSCXPNJJKKFJK
+      #   value: Authorization=dataKey RNAS5K65TUXXXXXXXXKOYBC4DSCZF
       - name: OTEL_com_oracle_apm_agent_data_upload_endpoint
-        value: https://aaaadffwh74ucaaaaaaaaac57y.apm-agt.us-sanjose-1.oci.oraclecloud.com
+        value: https://aaaadfxxxxxxxxaaaaac57y.apm-agt.us-sanjose-1.oci.oraclecloud.com
       - name: OTEL_com_oracle_apm_agent_private_data_key
-        value: RNAS5K65TUCQYG74QVNNSKOYBC4DSCZF
+        value: RNAS5K65TUXXXXXXXXKOYBC4DSCZF
 
 
         
