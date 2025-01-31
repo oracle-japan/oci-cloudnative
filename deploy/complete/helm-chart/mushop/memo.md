@@ -60,3 +60,7 @@ kubectl create secret generic cache-endpoint --namespace mushop --from-literal=h
 # APMは別途Manifestを適用。適用する際にはAPMのエンドポイントとアップロードプライベートキーを指定
 
 kubectl apply -f otel.yaml 
+
+# OCI DevOpsは以下のアーティファクトを作成し、Helmチャートによるデプロイを構築(ビルドパイプラインはマネージドビルドのみ)
+- oci://<リージョンコード>.ocir.io/<オブジェクトストレージネームスペース>/mushop/mushop-setup
+- oci://<リージョンコード>.ocir.io/<オブジェクトストレージネームスペース>/mushop/mushop
