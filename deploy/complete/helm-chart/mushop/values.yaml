@@ -18,6 +18,7 @@ tags:
 
 ingress:
   enabled: true
+  tls: false
 
 api:
   enabled: true
