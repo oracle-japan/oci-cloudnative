@@ -7,8 +7,21 @@ env:
   vaultVariables:
      OCI_REGISTRY_USERNAME: "ocid1.vaultsecret.oc1.us-sanjose-1.amaaaaaassxxxxxxxxxxxxv6hchmf5vmy357cnjq"
      OCI_REGISTRY_PASSWORD: "ocid1.vaultsecret.oc1.us-sanjose-1.amaaaaaassxxxxxxxxx7vlcmzxmzqylj65rjidsa"
+  exportedVariables:
+    - BUILDRUN_HASH
 
 steps:
+  - type: Command
+    name: "Export variables"
+    command: |
+      BUILDRUN_HASH=`cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 7 | head -n 1`
+      echo "BUILDRUN_HASH: " ${BUILDRUN_HASH}
+    onFailure:
+      - type: Command
+        command: |
+          echo "Handling Failure"
+          echo "Failure successfully handled"
+        runAs: root
   - type: Command
     name: "Helm Package mushop setup"
     command: |
