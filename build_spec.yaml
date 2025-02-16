@@ -5,8 +5,8 @@ runAs: root
 shell: bash
 env:
   vaultVariables:
-     OCI_REGISTRY_USERNAME: "ocid1.vaultsecret.oc1.us-sanjose-1.amaaaaaassxxxxxxxxxxxxv6hchmf5vmy357cnjq"
-     OCI_REGISTRY_PASSWORD: "ocid1.vaultsecret.oc1.us-sanjose-1.amaaaaaassxxxxxxxxx7vlcmzxmzqylj65rjidsa"
+     OCI_REGISTRY_USERNAME: "ocid1.vaultsecret.oc1.us-sanjose-1.amaaaaaassl65iqaxjzdtrtdk2s6dkq43p3iihiukmv6hchmf5vmy357cnjq"
+     OCI_REGISTRY_PASSWORD: "ocid1.vaultsecret.oc1.us-sanjose-1.amaaaaaassl65iqaq5imtkgwgvtnl37enofiqfp7vlcmzxmzqylj65rjidsa"
   exportedVariables:
     - BUILDRUN_HASH
 
