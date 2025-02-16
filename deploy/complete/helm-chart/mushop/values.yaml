@@ -34,9 +34,6 @@ catalogue:
 edge:
   enabled: true
 
-events:
-  enabled: true
-
 orders:
   enabled: true
 

@@ -17,6 +17,11 @@ ingress-nginx:
       enabled: true
     ingressClassResource:
       default: true
+    service:
+      annotations:
+        service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
+        service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
+        service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "10"
 
 # https://github.com/jetstack/cert-manager/blob/master/README.md
 # https://artifacthub.io/packages/helm/jetstack/cert-manager
