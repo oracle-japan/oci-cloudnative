@@ -28,9 +28,9 @@ RUN gradle clean test bootJar && ls -ltr /usr/src/app/build/libs
 # ------------
 # Stage 3 : Application container
 #
-FROM openjdk:21-jdk
+FROM eclipse-temurin:21-jdk
 
-RUN yum update && yum install -y procps
+RUN apt-get update && apt-get install -y procps
 
 # copy the generated application distribution
 COPY --from=appbuild /usr/src/app/build/libs/orders-0.0.1-SNAPSHOT.jar /app/orders-0.0.1-SNAPSHOT.jar
