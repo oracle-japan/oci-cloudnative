@@ -28,7 +28,7 @@ RUN gradle clean test bootJar && ls -ltr /usr/src/app/build/libs
 # ------------
 # Stage 3 : Application container
 #
-FROM openjdk:21-slim
+FROM openjdk:21-jdk
 
 RUN apt-get update && apt-get install -y procps
 
