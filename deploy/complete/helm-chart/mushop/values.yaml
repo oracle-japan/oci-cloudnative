@@ -22,6 +22,9 @@ ingress:
 
 api:
   enabled: true
+  env:
+    mediaUrl:                 # Object Storage URL for catalogue image assets
+    newsletterSubscribeUrl:   # Newsletter subscription endpoint (https://[API_GATEWAY_URL]/newsletter/subscribe)
 
 assets:
   enabled: true
