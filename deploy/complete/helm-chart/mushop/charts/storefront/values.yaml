@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: iad.ocir.io/oracle/ateam/mushop-storefront
-  tag: 2.3
+  repository: nrt.ocir.io/orasejapan/mushop-storefront
+  tag: latest
   pullPolicy: Always
 
 env:

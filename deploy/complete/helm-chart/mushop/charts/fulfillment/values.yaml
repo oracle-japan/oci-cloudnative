@@ -19,6 +19,3 @@ streaming:
   secret: kafka-secret
   serverKey: server
   configKey: config
-
-opentelemetry:
-  provider: oci

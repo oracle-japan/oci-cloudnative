@@ -1,0 +1,10 @@
+.DS_Store
+.env
+build
+coverage
+node_modules
+Makefile
+
+# test support files
+test/docker-compose.yml
+test/Dockerfile

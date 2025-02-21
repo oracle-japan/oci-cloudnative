@@ -24,6 +24,3 @@ env:
 
 service:
   port: 80
-
-opentelemetry:
-  provider: oci
