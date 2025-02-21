@@ -52,6 +52,3 @@ fulfillment:
 
 user:
   enabled: true
-
-opentelemetry:
-  provider: oci
