@@ -69,7 +69,7 @@ steps:
     shell: /bin/sh
     command: |
       CURRENT_VERSION=`yq ".version" deploy/complete/helm-chart/setup/Chart.yaml`
-      NEW_VERSION=`echo "${CURRENT_CHART_VERSION}" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g'`
+      NEW_VERSION=`echo "${CURRENT_VERSION}" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g'`
     onFailure:
       - type: Command
         command: |
