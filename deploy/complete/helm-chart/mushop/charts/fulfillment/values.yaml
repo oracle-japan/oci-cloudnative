@@ -1,8 +1,8 @@
 replicaCount: 1
 
 image:
-  repository: nrt.ocir.io/orasejapan/mushop-fulfillment
-  tag: latest
+  repository: sjc.ocir.io/orasejapan/mushop-fulfillment
+  tag: ${NEW_VERSION}
   pullPolicy: Always
 
 osb: {}
