@@ -14,7 +14,7 @@ steps:
   - type: Command
     name: "Install yq"
     command: |
-      sudo wget https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64 -O /usr/local/bin/yq && sudo chmod +x /usr/local/bin/yq
+      sudo curl -OL https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64 -O /usr/local/bin/yq && sudo chmod +x /usr/local/bin/yq
     onFailure:
       - type: Command
         command: |
