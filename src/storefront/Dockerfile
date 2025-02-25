@@ -7,7 +7,7 @@ ARG version
 ###############################
 #    Build stage (node/npm)   #
 ###############################
-FROM --platform=${BUILDPLATFORM:-linux/amd64} node:16-alpine as builder
+FROM --platform=${BUILDPLATFORM:-linux/amd64} node:16-alpine AS builder
 
 RUN apk update && apk add --no-cache \
     autoconf \
@@ -37,15 +37,15 @@ COPY src src
 COPY *.js* ./
 COPY VERSION VERSION
 ARG version
-ENV VERSION ${version}
+ENV VERSION=${version}
 
-ENV NODE_ENV "production"
+ENV NODE_ENV="production"
 RUN npm run build
 
 ###############################
 # Webserver container (nginx) #
 ###############################
-FROM --platform=${TARGETPLATFORM:-linux/amd64} nginxinc/nginx-unprivileged:1.20-alpine
+FROM nginxinc/nginx-unprivileged:1.20-alpine
 
 USER root
 RUN chown -R 101:101 /usr/share/nginx
