@@ -19,7 +19,13 @@ RUN apk update && apk add --no-cache \
     libjpeg-turbo-dev \
     libpng-dev \
     make \
-    nasm
+    nasm \
+    libjpeg-turbo \
+    libjpeg-turbo-dev \
+    libpng-dev \
+    libpng-dev \
+    automake
+
 
 RUN npm config set loglevel warn \
     && npm set progress=false
