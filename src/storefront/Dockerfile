@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:experimental
 #
 # Copyright (c) 2019-2022 Oracle and/or its affiliates. All rights reserved.
 # The Universal Permissive License (UPL), Version 1.0

@@ -55,7 +55,7 @@ steps:
     name: "Container Image Build storefront"
     shell: /bin/sh
     command: |
-      docker image build -t image_storefront ./src/storefront/ 
+      DOCKER_BUILDKIT=1 docker image build -t image_storefront ./src/storefront/ 
     onFailure:
       - type: Command
         command: |
