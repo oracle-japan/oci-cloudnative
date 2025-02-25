@@ -12,8 +12,9 @@ env:
 
 steps:
   - type: Command
-    name: "Install yq"
+    name: "Setup CLI"
     command: |
+      sudo yum update && sudo yum install -y docker-ce
       curl -OL https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64 && mv yq_linux_amd64 yq && chmod +x yq && mv yq /usr/local/bin/yq
     onFailure:
       - type: Command
@@ -55,7 +56,7 @@ steps:
     name: "Container Image Build storefront"
     shell: /bin/sh
     command: |
-      DOCKER_BUILDKIT=1 docker image build -t image_storefront ./src/storefront/ 
+      docker image build -t image_storefront ./src/storefront/ 
     onFailure:
       - type: Command
         command: |
