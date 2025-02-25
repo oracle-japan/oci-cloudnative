@@ -15,7 +15,7 @@ steps:
     name: "Setup CLI"
     command: |
       yum update
-      yum install -y docker-ce
+      yum install docker-engine docker-cli  
       docker --version
       curl -OL https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64
       mv yq_linux_amd64 yq
