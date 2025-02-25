@@ -14,17 +14,6 @@ steps:
   - type: Command
     name: "Setup CLI"
     command: |
-      tee /etc/yum.repos.d/docker.repo <<-EOF
-      [dockerrepo]
-      name=Docker Repository
-      baseurl=https://yum.dockerproject.org/repo/main/oraclelinux/7
-      enabled=1
-      gpgcheck=1
-      gpgkey=https://yum.dockerproject.org/gpg
-      EOF
-      yum install docker-engine
-      docker --version
-      systemctl start docker.service
       curl -OL https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64
       mv yq_linux_amd64 yq
       chmod +x yq
@@ -69,7 +58,7 @@ steps:
     name: "Container Image Build storefront"
     shell: /bin/sh
     command: |
-      docker image build -t image_storefront ./src/storefront/ 
+      DOCKER_BUILDKIT=1 docker image build -t image_storefront ./src/storefront/ 
     onFailure:
       - type: Command
         command: |
