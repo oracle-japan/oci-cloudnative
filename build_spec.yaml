@@ -65,7 +65,7 @@ steps:
     name: "Helm Package mushop setup"
     command: |
       helm dependency update deploy/complete/helm-chart/setup/
-      helm package deploy/complete/helm-chart/setup/
+      helm package deploy/complete/helm-chart/setup/ --version ${VERSION}
     onFailure:
       - type: Command
         command: |
@@ -75,7 +75,7 @@ steps:
   - type: Command
     name: "Helm Package mushop"
     command: |
-      helm package deploy/complete/helm-chart/mushop/
+      helm package deploy/complete/helm-chart/mushop/ --version ${VERSION}
     onFailure:
       - type: Command
         command: |
