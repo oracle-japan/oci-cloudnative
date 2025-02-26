@@ -20,5 +20,4 @@ variable "oci_registry_password" {
 
 ### Email Delivery
 variable "email_address" {
-  description = "Email address for Email Delivery"
 }
