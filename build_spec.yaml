@@ -94,7 +94,7 @@ steps:
   - type: Command
     name: "Helm Push mushop setup"
     command: |
-      helm push mushop-setup-${NEW_VERSION}.tgz oci://sjc.ocir.io/orasejapan/mushop/
+      helm push mushop-setup-${VERSION}.tgz oci://sjc.ocir.io/orasejapan/mushop/
     onFailure:
       - type: Command
         command: |
@@ -103,7 +103,7 @@ steps:
   - type: Command
     name: "Helm Push setup"
     command: |
-      helm push mushop-${NEW_VERSION}.tgz oci://sjc.ocir.io/orasejapan/mushop/
+      helm push mushop-${VERSION}.tgz oci://sjc.ocir.io/orasejapan/mushop/
     onFailure:
       - type: Command
         command: |

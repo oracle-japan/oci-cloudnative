@@ -2,7 +2,7 @@ replicaCount: 1
 
 image:
   repository: sjc.ocir.io/orasejapan/mushop-fulfillment
-  tag: ${NEW_VERSION}
+  tag: ${VERSION}
   pullPolicy: Always
 
 osb: {}
