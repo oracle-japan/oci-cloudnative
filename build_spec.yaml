@@ -8,22 +8,9 @@ env:
      OCI_REGISTRY_USERNAME: "ocid1.vaultsecret.oc1.us-sanjose-1.amaaaaaassl65iqaxjzdtrtdk2s6dkq43p3iihiukmv6hchmf5vmy357cnjq"
      OCI_REGISTRY_PASSWORD: "ocid1.vaultsecret.oc1.us-sanjose-1.amaaaaaassl65iqaq5imtkgwgvtnl37enofiqfp7vlcmzxmzqylj65rjidsa"
   exportedVariables:
-    - NEW_VERSION
+    - VERSION
 
 steps:
-  - type: Command
-    name: "Setup CLI"
-    command: |
-      curl -OL https://github.com/mikefarah/yq/releases/download/v4.45.1/yq_linux_amd64
-      mv yq_linux_amd64 yq
-      chmod +x yq
-      mv yq /usr/local/bin/yq
-    onFailure:
-      - type: Command
-        command: |
-          echo "Handling Failure"
-          echo "Failure successfully handled"
-        runAs: root
   - type: Command
     name: "Container Image Build api"
     shell: /bin/sh
@@ -65,31 +52,10 @@ steps:
           echo "Failured build"
         runAs: root
   - type: Command
-    name: "update the version"
+    name: "check version"
     shell: /bin/sh
     command: |
-      CURRENT_VERSION=`yq ".version" deploy/complete/helm-chart/setup/Chart.yaml`
-      NEW_VERSION=`echo "${CURRENT_VERSION}" | awk -F. '{$NF = $NF + 1;} 1' | sed 's/ /./g'`
-    onFailure:
-      - type: Command
-        command: |
-          echo "Failured build"
-        runAs: root
-  - type: Command
-    name: "update the Mushop-Setup Helm Chart Version"
-    shell: /bin/sh
-    command: |
-      yq -i ".version = \"${NEW_VERSION}\"" deploy/complete/helm-chart/setup/Chart.yaml
-    onFailure:
-      - type: Command
-        command: |
-          echo "Failured build"
-        runAs: root
-  - type: Command
-    name: "update the Mushop Helm Chart Version"
-    shell: /bin/sh
-    command: |
-      yq -i ".version = \"${NEW_VERSION}\"" deploy/complete/helm-chart/mushop/Chart.yaml
+      VERSION=`cat appVersion |tr -d "\n"`
     onFailure:
       - type: Command
         command: |
