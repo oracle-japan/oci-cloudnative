@@ -1,10 +1,5 @@
 replicaCount: 1
 
-image:
-  repository: sjc.ocir.io/orasejapan/mushop-storefront
-  tag: ${VERSION}
-  pullPolicy: Always
-
 env:
   odaEnabled:
   odaUri:

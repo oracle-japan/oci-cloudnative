@@ -125,13 +125,4 @@ outputArtifacts:
     location: image_storefront
   - name: api-values
     type: BINARY
-    location: deploy/complete/helm-chart/mushop/charts/api/values.yaml
-  - name: orders-values
-    type: BINARY
-    location: deploy/complete/helm-chart/mushop/charts/orders/values.yaml
-  - name: fulfillment-values
-    type: BINARY
-    location: deploy/complete/helm-chart/mushop/charts/fulfillment/values.yaml
-  - name: storefront-values
-    type: BINARY
-    location: deploy/complete/helm-chart/mushop/charts/storefront/values.yaml
+    location: deploy/complete/helm-chart/mushop/values.yaml

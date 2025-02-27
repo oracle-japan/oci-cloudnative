@@ -1,14 +1,5 @@
 replicaCount: 1
 
-image:
-  repository: sjc.ocir.io/orasejapan/mushop-api
-  tag: ${VERSION}
-  pullPolicy: Always
-
-env:
-  mediaUrl: /assets
-  newsletterSubscribeUrl:
-
 resources:
   limits:
     cpu: 300m
@@ -40,7 +31,3 @@ hpa:
           averageUtilization: 70
 service:
   port: 80
-
-cache:
-  secret: cache-endpoint
-  hostKey: host

@@ -1,10 +1,5 @@
 replicaCount: 1
 
-image:
-  repository: sjc.ocir.io/orasejapan/mushop-fulfillment
-  tag: ${VERSION}
-  pullPolicy: Always
-
 osb: {}
 
 env:
@@ -14,11 +9,3 @@ env:
 
 service:
   port: 80
-
-streaming:
-  secret: kafka-secret
-  serverKey: server
-  configKey: config
-
-opentelemetry:
-  provider: oci
