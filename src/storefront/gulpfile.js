@@ -113,7 +113,7 @@ gulp.task('image:copy', function () {
 
 // optimize images 
 gulp.task('image:optimize', function (done) {
-  return gulp.src(`${opt.buildDir}/images/**/*`, { encoding: false })
+  return gulp.src(`${opt.buildDir}/images/**/*`)
     .pipe(cache(imagemin([
       pngquant({ quality: [0.3, 0.5] }),
       imagemin.gifsicle({ interlaced: true }),
