@@ -12,17 +12,38 @@ locals {
 
 resource "oci_artifacts_container_repository" "mushop_orders_registry" {
   compartment_id = var.compartment_ocid
-  display_name   = "mushop/orders"
+  display_name   = "mushop-orders"
+  is_public      = true
 }
 
 resource "oci_artifacts_container_repository" "mushop_api_registry" {
   compartment_id = var.compartment_ocid
-  display_name   = "mushop/api"
+  display_name   = "mushop-api"
+  is_public      = true
 }
 
 resource "oci_artifacts_container_repository" "mushop_fulfillment_registry" {
   compartment_id = var.compartment_ocid
-  display_name   = "mushop/fulfillment"
+  display_name   = "mushop-fulfillment"
+  is_public      = true
+}
+
+resource "oci_artifacts_container_repository" "mushop_storefront_registry" {
+  compartment_id = var.compartment_ocid
+  display_name   = "mushop-storefront"
+  is_public      = true
+}
+
+resource "oci_artifacts_container_repository" "mushop_setup_registry" {
+  compartment_id = var.compartment_ocid
+  display_name   = "mushop/mushop-setup"
+  is_public      = true
+}
+
+resource "oci_artifacts_container_repository" "mushop_registry" {
+  compartment_id = var.compartment_ocid
+  display_name   = "mushop/mushop"
+  is_public      = true
 }
 
 resource "oci_devops_project" "mushop_devops_project" {
