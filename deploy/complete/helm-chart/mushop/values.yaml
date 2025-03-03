@@ -50,7 +50,7 @@ edge:
 orders:
   enabled: true
   image:
-    repository: sjc.ocir.io/orasejapan/mushop-order
+    repository: sjc.ocir.io/orasejapan/mushop-orders
     tag: ${VERSION}
     pullPolicy: Always
   streaming:
