@@ -7,7 +7,6 @@ data "oci_objectstorage_namespace" "namespace" {
 
 locals {
   home_region_key = lower(data.oci_identity_tenancy.tenant_details.home_region_key)
-  namespace       = data.oci_objectstorage_namespace.namespace.namespace
 }
 
 resource "oci_artifacts_container_repository" "mushop_orders_registry" {
@@ -227,6 +226,12 @@ resource "oci_devops_build_pipeline_stage" "mushop_trigger_deployment_pipeline" 
 resource "oci_devops_deploy_pipeline" "mushop_deploy_pipeline" {
   project_id   = oci_devops_project.mushop_devops_project.id
   display_name = "mushop-deploy"
+  deploy_pipeline_parameters {
+    items {
+      name          = "ENFORCE_HELM_DEPLOYMENT"
+      default_value = true
+    }
+  }
 }
 
 resource "oci_devops_deploy_environment" "mushop_env" {
@@ -247,6 +252,7 @@ resource "oci_devops_deploy_stage" "mushop_setup_stage" {
   deploy_stage_type                 = "OKE_HELM_CHART_DEPLOYMENT"
   helm_chart_deploy_artifact_id     = oci_devops_deploy_artifact.mushop_setup_artifact.id
   release_name                      = "mushop-utilities"
+  are_hooks_enabled                 = true
   oke_cluster_deploy_environment_id = oci_devops_deploy_environment.mushop_env.id
   namespace                         = "mushop"
 }
