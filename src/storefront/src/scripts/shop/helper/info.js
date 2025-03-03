@@ -10,7 +10,7 @@ const iconPrefix = obj => toArray(obj).forEach(row => row.icon = row.icon && ico
 export const TechType = {
   OCI: {
     name: 'Oracle Cloud Infrastructure',
-    icon: 'oci.png',
+    icon: 'oci.svg',
     color: '#f80000',
   },
   NETWORK: {
@@ -25,7 +25,7 @@ export const TechType = {
   },
   OKE: {
     name: 'Oracle Container Engine',
-    icon: 'k8s.png',
+    icon: 'k8s.svg',
     color: '#00758f',
   },
 };
@@ -36,7 +36,7 @@ export const ServiceType = {
   // OCI Stuff
   ATP: {
     name: 'Oracle ATP',
-    icon: 'atp.png',
+    icon: 'atp.svg',
     scale: 1.2,
   },
   BUCKET: {
@@ -75,16 +75,16 @@ export const ServiceType = {
   },
   FN: {
     name: 'Function',
-    icon: 'fn.png',
+    icon: 'fn.svg',
   },
   NATS: {
     name: 'NATS',
-    icon: 'nats.png',
+    icon: 'nats.svg',
   },
   // container technologies
   JAVA: {
     name: 'Java',
-    icon: 'java.png',
+    icon: 'java.svg',
     scale: 1.5,
   },
   HELIDON: {
@@ -93,7 +93,7 @@ export const ServiceType = {
   },
   NODE: {
     name: 'Node.js',
-    icon: 'nodejs.png',
+    icon: 'nodejs.svg',
   },
   TYPESCRIPT: {
     name: 'TypeScript/Node.js',
@@ -102,11 +102,11 @@ export const ServiceType = {
   },
   REDIS: {
     name: 'Redis',
-    icon: 'redis.png',
+    icon: 'redis.svg',
   },
   GO: {
     name: 'Go',
-    icon: 'go.png',
+    icon: 'go.svg',
     scale: 1.8,
   },
   TRAEFIK: {
@@ -119,15 +119,15 @@ export const ServiceType = {
   },
   NGINX: {
     name: 'Nginx',
-    icon: 'nginx.png',
+    icon: 'nginx.svg',
   },
   HTML5: {
     name: 'HTML5',
-    icon: 'html5.png',
+    icon: 'html5.svg',
   },
   MICRONAUT: {
     name: 'Micronaut',
-    icon: 'micronaut.png',
+    icon: 'micronaut.svg',
   },
 };
 // add icon paths
