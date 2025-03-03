@@ -18,7 +18,7 @@ function initSdk(name) {
   // Retry initialization later if WebSDK is not available yet
   // eslint-disable-next-line no-undef
   if (!document || !WebSDK) {
-    setTimeout(function() {
+    setTimeout(function () {
       initSdk(name);
     }, 2000);
     return;
@@ -29,7 +29,7 @@ function initSdk(name) {
   }
   var Bots;
 
-  setTimeout(function() {
+  setTimeout(function () {
     /**
          * SDK configuration settings
          * Other than URI, all fields are optional with two exceptions for auth modes
@@ -55,7 +55,7 @@ function initSdk(name) {
       },
       timestampMode: 'relative',                  // Sets the timestamp mode, relative to current time or default (absolute)
       // theme: WebSDK.THEME.REDWOOD_DARK         // Redwood dark (THEME.REDWOOD_DARK ) theme. The default is THEME.DEFAULT, while older theme is available as THEME.CLASSIC
-      botIcon: 'images/mucat.png',                // Sets the bot icon
+      botIcon: 'images/mucat.svg',                // Sets the bot icon
       font: '14px "Helvetica Neue", Helvetica, Arial, sans-serif',
       height: '70vh',
       colors: {    //custom colors property
@@ -79,7 +79,7 @@ function initSdk(name) {
     // Connect to skill when the widget is expanded for the first time
     var isFirstConnection = true;
     // eslint-disable-next-line no-undef
-    Bots.on(WebSDK.EVENT.WIDGET_OPENED, function() {
+    Bots.on(WebSDK.EVENT.WIDGET_OPENED, function () {
       if (isFirstConnection) {
         Bots.connect();
         isFirstConnection = false;
@@ -99,8 +99,8 @@ function initSdk(name) {
  * @returns {Promise} Promise to provide a signed JWT token
  */
 function generateToken() {
-  return new Promise(function(resolve) {
-    mockApiCall('https://mockurl').then(function(token) {
+  return new Promise(function (resolve) {
+    mockApiCall('https://mockurl').then(function (token) {
       resolve(token);
     });
   });
@@ -113,8 +113,8 @@ function generateToken() {
  * @returns {Promise} Promise to provide a signed JWT token
  */
 function mockApiCall() {
-  return new Promise(function(resolve) {
-    setTimeout(function() {
+  return new Promise(function (resolve) {
+    setTimeout(function () {
       var now = Math.floor(Date.now() / 1000);
       var payload = {
         iat: now,
