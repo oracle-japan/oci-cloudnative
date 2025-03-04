@@ -1,9 +1,13 @@
 terraform {
   required_version = "~> 1.2.0"
   required_providers {
-    name = {
+    oci = {
       source  = "oracle/oci"
       version = "6.27.0"
+    }
+    time = {
+      source  = "hashicorp/time"
+      version = "0.12.1"
     }
   }
 }
