@@ -74,8 +74,8 @@ resource "oci_devops_deploy_artifact" "mushop_orders_artifact" {
   deploy_artifact_source {
     deploy_artifact_source_type = "OCIR"
     image_uri = format(
-      "%s.ocir.io/%s/mushop-orders:$${VERSION}",
-      local.home_region_key,
+      "ocir.%s.oci.oraclecloud.com/%s/mushop-orders:$${VERSION}",
+      var.region,
       local.namespace
     )
   }
@@ -89,8 +89,8 @@ resource "oci_devops_deploy_artifact" "mushop_api_artifact" {
   deploy_artifact_source {
     deploy_artifact_source_type = "OCIR"
     image_uri = format(
-      "%s.ocir.io/%s/mushop-api:$${VERSION}",
-      local.home_region_key,
+      "ocir.%s.oci.oraclecloud.com/%s/mushop-api:$${VERSION}",
+      var.region,
       local.namespace
     )
   }
@@ -104,8 +104,8 @@ resource "oci_devops_deploy_artifact" "mushop_fulfillment_artifact" {
   deploy_artifact_source {
     deploy_artifact_source_type = "OCIR"
     image_uri = format(
-      "%s.ocir.io/%s/mushop-fulfillment:$${VERSION}",
-      local.home_region_key,
+      "ocir.%s.oci.oraclecloud.com/%s/mushop-fulfillment:$${VERSION}",
+      var.region,
       local.namespace
     )
   }
@@ -119,8 +119,8 @@ resource "oci_devops_deploy_artifact" "mushop_storefront_artifact" {
   deploy_artifact_source {
     deploy_artifact_source_type = "OCIR"
     image_uri = format(
-      "%s.ocir.io/%s/mushop-storefront:$${VERSION}",
-      local.home_region_key,
+      "ocir.%s.oci.oraclecloud.com/%s/mushop-storefront:$${VERSION}",
+      var.region,
       local.namespace
     )
   }
@@ -135,8 +135,8 @@ resource "oci_devops_deploy_artifact" "mushop_setup_artifact" {
     deploy_artifact_source_type = "HELM_CHART"
     deploy_artifact_version     = "$${VERSION}"
     chart_url = format(
-      "oci://%s.ocir.io/%s/mushop/mushop-setup",
-      local.home_region_key,
+      "oci://ocir.%s.oci.oraclecloud.com/%s/mushop/mushop-setup",
+      var.region,
       local.namespace
     )
   }
@@ -151,8 +151,8 @@ resource "oci_devops_deploy_artifact" "mushop_deploy_artifact" {
     deploy_artifact_source_type = "HELM_CHART"
     deploy_artifact_version     = "$${VERSION}"
     chart_url = format(
-      "oci://%s.ocir.io/%s/mushop/mushop",
-      local.home_region_key,
+      "oci://ocir.%s.oci.oraclecloud.com/%s/mushop/mushop",
+      var.region,
       local.namespace
     )
   }
@@ -245,7 +245,7 @@ resource "oci_devops_build_pipeline" "mushop_build_pipeline" {
     items {
       name          = "REGION"
       description   = "Region key of mushop environment."
-      default_value = local.home_region_key
+      default_value = var.region
     }
     items {
       name          = "NAMESPACE"
