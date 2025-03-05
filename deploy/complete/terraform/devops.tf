@@ -244,12 +244,10 @@ resource "oci_devops_build_pipeline" "mushop_build_pipeline" {
   build_pipeline_parameters {
     items {
       name          = "REGION"
-      description   = "Region key of mushop environment."
       default_value = var.region
     }
     items {
       name          = "NAMESPACE"
-      description   = "Namespace of Object Storage."
       default_value = local.namespace
     }
   }
