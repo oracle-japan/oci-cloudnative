@@ -15,7 +15,7 @@ steps:
     name: "Container Image Build api"
     shell: /bin/sh
     command: |
-      docker image build -t image_api ./src/api/
+      docker image build -t mushop-api ./src/api/
     onFailure:
       - type: Command
         command: |
@@ -25,7 +25,7 @@ steps:
     name: "Container Image Build orders"
     shell: /bin/sh
     command: |
-      docker image build -t image_orders ./src/orders/
+      docker image build -t mushop-orders ./src/orders/
     onFailure:
       - type: Command
         command: |
@@ -35,7 +35,7 @@ steps:
     name: "Container Image Build fulfillment"
     shell: /bin/sh
     command: |
-      docker image build -t image_fulfillment ./src/fulfillment/ -f ./src/fulfillment/Dockerfile.jvm
+      docker image build -t mushop-fulfillment ./src/fulfillment/ -f ./src/fulfillment/Dockerfile.jvm
     onFailure:
       - type: Command
         command: |
@@ -45,7 +45,7 @@ steps:
     name: "Container Image Build storefront"
     shell: /bin/sh
     command: |
-      DOCKER_BUILDKIT=1 docker image build -t image_storefront ./src/storefront/ 
+      DOCKER_BUILDKIT=1 docker image build -t mushop-storefront ./src/storefront/ 
     onFailure:
       - type: Command
         command: |
@@ -85,7 +85,7 @@ steps:
   - type: Command
     name: "Helm Registry Login"
     command: |
-      helm registry login sjc.ocir.io -u $OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
+      helm registry login ocir.<region-identifier>.oci.oraclecloud.com -u $OCI_REGISTRY_USERNAME -p $OCI_REGISTRY_PASSWORD
     onFailure:
       - type: Command
         command: |
@@ -94,7 +94,7 @@ steps:
   - type: Command
     name: "Helm Push mushop setup"
     command: |
-      helm push mushop-setup-${VERSION}.tgz oci://sjc.ocir.io/orasejapan/mushop/
+      helm push mushop-setup-${VERSION}.tgz oci://ocir.<region-identifier>.oci.oraclecloud.com/<your-object-storage-namespace>/mushop/
     onFailure:
       - type: Command
         command: |
@@ -103,7 +103,7 @@ steps:
   - type: Command
     name: "Helm Push setup"
     command: |
-      helm push mushop-${VERSION}.tgz oci://sjc.ocir.io/orasejapan/mushop/
+      helm push mushop-${VERSION}.tgz oci://ocir.<region-identifier>.oci.oraclecloud.com/<your-object-storage-namespace>/mushop/
     onFailure:
       - type: Command
         command: |
@@ -111,18 +111,18 @@ steps:
         runAs: root
 
 outputArtifacts:
-  - name: image_api
+  - name: mushop-api
     type: DOCKER_IMAGE
-    location: image_api
-  - name: image_orders
+    location: mushop-api
+  - name: mushop-orders
     type: DOCKER_IMAGE
-    location: image_orders
-  - name: image_fulfillment
+    location: mushop-orders
+  - name: mushop-fulfillment
     type: DOCKER_IMAGE
-    location: image_fulfillment
-  - name: image_storefront
+    location: mushop-fulfillment
+  - name: mushop-storefront
     type: DOCKER_IMAGE
-    location: image_storefront
-  - name: api-values
+    location: mushop-storefront
+  - name: values
     type: BINARY
     location: deploy/complete/helm-chart/mushop/values.yaml
