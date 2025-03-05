@@ -373,6 +373,7 @@ resource "oci_devops_deploy_stage" "mushop_deploy" {
   }
   deploy_stage_type                 = "OKE_HELM_CHART_DEPLOYMENT"
   helm_chart_deploy_artifact_id     = oci_devops_deploy_artifact.mushop_deploy_artifact.id
+  values_artifact_ids               = [oci_devops_deploy_artifact.mushop_values_artifact.id]
   release_name                      = "mushop"
   oke_cluster_deploy_environment_id = oci_devops_deploy_environment.mushop_env.id
   namespace                         = "mushop"
