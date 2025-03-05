@@ -357,7 +357,7 @@ resource "oci_devops_deploy_stage" "mushop_setup_stage" {
     policy_type = "AUTOMATED_STAGE_ROLLBACK_POLICY"
   }
   oke_cluster_deploy_environment_id = oci_devops_deploy_environment.mushop_env.id
-  namespace                         = "mushop"
+  namespace                         = "mushop-utilities"
 }
 
 resource "oci_devops_deploy_stage" "mushop_deploy" {
