@@ -349,10 +349,13 @@ resource "oci_devops_deploy_stage" "mushop_setup_stage" {
       id = oci_devops_deploy_pipeline.mushop_deploy_pipeline.id
     }
   }
-  deploy_stage_type                 = "OKE_HELM_CHART_DEPLOYMENT"
-  helm_chart_deploy_artifact_id     = oci_devops_deploy_artifact.mushop_setup_artifact.id
-  release_name                      = "mushop-utilities"
-  are_hooks_enabled                 = true
+  deploy_stage_type             = "OKE_HELM_CHART_DEPLOYMENT"
+  helm_chart_deploy_artifact_id = oci_devops_deploy_artifact.mushop_setup_artifact.id
+  release_name                  = "mushop-utilities"
+  are_hooks_enabled             = true
+  rollback_policy {
+    policy_type = "AUTOMATED_STAGE_ROLLBACK_POLICY"
+  }
   oke_cluster_deploy_environment_id = oci_devops_deploy_environment.mushop_env.id
   namespace                         = "mushop"
 }
@@ -364,6 +367,9 @@ resource "oci_devops_deploy_stage" "mushop_deploy" {
     items {
       id = oci_devops_deploy_stage.mushop_setup_stage.id
     }
+  }
+  rollback_policy {
+    policy_type = "AUTOMATED_STAGE_ROLLBACK_POLICY"
   }
   deploy_stage_type                 = "OKE_HELM_CHART_DEPLOYMENT"
   helm_chart_deploy_artifact_id     = oci_devops_deploy_artifact.mushop_deploy_artifact.id
