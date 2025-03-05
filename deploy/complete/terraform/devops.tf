@@ -241,6 +241,18 @@ resource "oci_devops_trigger" "mushop_trigger" {
 resource "oci_devops_build_pipeline" "mushop_build_pipeline" {
   project_id   = oci_devops_project.mushop_devops_project.id
   display_name = "mushop-build"
+  build_pipeline_parameters {
+    items {
+      name          = "REGION"
+      description   = "Region key of mushop environment."
+      default_value = local.home_region_key
+    }
+    items {
+      name          = "NAMESPACE"
+      description   = "Namespace of Object Storage."
+      default_value = local.namespace
+    }
+  }
 }
 
 resource "oci_devops_build_pipeline_stage" "mushop_helm" {
