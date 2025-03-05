@@ -250,6 +250,14 @@ resource "oci_devops_build_pipeline" "mushop_build_pipeline" {
       name          = "NAMESPACE"
       default_value = local.namespace
     }
+    items {
+      name          = "PAR"
+      default_value = oci_objectstorage_preauthrequest.mushop_preauthenticated_request.full_path
+    }
+    items {
+      name          = "APIGATEWAY"
+      default_value = oci_apigateway_gateway.mushop_api_gateway.hostname
+    }
   }
 }
 
