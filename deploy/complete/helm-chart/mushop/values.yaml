@@ -23,7 +23,7 @@ ingress:
 api:
   enabled: true
   image:
-    repository: sjc.ocir.io/orasejapan/mushop-api
+    repository: ${REGION}.ocir.io/${NAMESPACE}/mushop-api
     tag: ${VERSION}
     pullPolicy: Always
   cache:
@@ -50,7 +50,7 @@ edge:
 orders:
   enabled: true
   image:
-    repository: sjc.ocir.io/orasejapan/mushop-orders
+    repository: ${REGION}.ocir.io/${NAMESPACE}/mushop-orders
     tag: ${VERSION}
     pullPolicy: Always
   streaming:
@@ -66,14 +66,14 @@ payment:
 storefront:
   enabled: true
   image:
-    repository: sjc.ocir.io/orasejapan/mushop-storefront
+    repository: ${REGION}.ocir.io/${NAMESPACE}/mushop-storefront
     tag: ${VERSION}
     pullPolicy: Always
 
 fulfillment:
   enabled: true
   image:
-    repository: sjc.ocir.io/orasejapan/mushop-fulfillment
+    repository: ${REGION}.ocir.io/${NAMESPACE}/mushop-fulfillment
     tag: ${VERSION}
     pullPolicy: Always
   streaming:
