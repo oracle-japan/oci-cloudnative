@@ -4,5 +4,5 @@ resource "oci_redis_redis_cluster" "mushop_cache" {
   node_count         = 3
   node_memory_in_gbs = 16
   software_version   = "REDIS_7_0"
-  subnet_id          = oci_core_subnet.mushop_public_subnet.id
+  subnet_id          = oci_core_subnet.mushop_node_subnet.id
 }
