@@ -74,8 +74,8 @@ resource "oci_devops_deploy_artifact" "mushop_orders_artifact" {
   deploy_artifact_source {
     deploy_artifact_source_type = "OCIR"
     image_uri = format(
-      "%s.ocir.io/%s/mushop-orders:$${VERSION}",
-      local.home_region_key,
+      "ocir.%s.oci.oraclecloud.com/%s/mushop-orders:$${VERSION}",
+      var.region,
       local.namespace
     )
   }
@@ -89,8 +89,8 @@ resource "oci_devops_deploy_artifact" "mushop_api_artifact" {
   deploy_artifact_source {
     deploy_artifact_source_type = "OCIR"
     image_uri = format(
-      "%s.ocir.io/%s/mushop-api:$${VERSION}",
-      local.home_region_key,
+      "ocir.%s.oci.oraclecloud.com/%s/mushop-api:$${VERSION}",
+      var.region,
       local.namespace
     )
   }
@@ -104,8 +104,8 @@ resource "oci_devops_deploy_artifact" "mushop_fulfillment_artifact" {
   deploy_artifact_source {
     deploy_artifact_source_type = "OCIR"
     image_uri = format(
-      "%s.ocir.io/%s/mushop-fulfillment:$${VERSION}",
-      local.home_region_key,
+      "ocir.%s.oci.oraclecloud.com/%s/mushop-fulfillment:$${VERSION}",
+      var.region,
       local.namespace
     )
   }
@@ -119,8 +119,8 @@ resource "oci_devops_deploy_artifact" "mushop_storefront_artifact" {
   deploy_artifact_source {
     deploy_artifact_source_type = "OCIR"
     image_uri = format(
-      "%s.ocir.io/%s/mushop-storefront:$${VERSION}",
-      local.home_region_key,
+      "ocir.%s.oci.oraclecloud.com/%s/mushop-storefront:$${VERSION}",
+      var.region,
       local.namespace
     )
   }
@@ -135,8 +135,8 @@ resource "oci_devops_deploy_artifact" "mushop_setup_artifact" {
     deploy_artifact_source_type = "HELM_CHART"
     deploy_artifact_version     = "$${VERSION}"
     chart_url = format(
-      "oci://%s.ocir.io/%s/mushop/mushop-setup",
-      local.home_region_key,
+      "oci://ocir.%s.oci.oraclecloud.com/%s/mushop/mushop-setup",
+      var.region,
       local.namespace
     )
   }
@@ -151,8 +151,8 @@ resource "oci_devops_deploy_artifact" "mushop_deploy_artifact" {
     deploy_artifact_source_type = "HELM_CHART"
     deploy_artifact_version     = "$${VERSION}"
     chart_url = format(
-      "oci://%s.ocir.io/%s/mushop/mushop",
-      local.home_region_key,
+      "oci://ocir.%s.oci.oraclecloud.com/%s/mushop/mushop",
+      var.region,
       local.namespace
     )
   }
@@ -241,6 +241,24 @@ resource "oci_devops_trigger" "mushop_trigger" {
 resource "oci_devops_build_pipeline" "mushop_build_pipeline" {
   project_id   = oci_devops_project.mushop_devops_project.id
   display_name = "mushop-build"
+  build_pipeline_parameters {
+    items {
+      name          = "REGION"
+      default_value = var.region
+    }
+    items {
+      name          = "NAMESPACE"
+      default_value = local.namespace
+    }
+    items {
+      name          = "PAR"
+      default_value = oci_objectstorage_preauthrequest.mushop_preauthenticated_request.full_path
+    }
+    items {
+      name          = "APIGATEWAY"
+      default_value = oci_apigateway_gateway.mushop_api_gateway.hostname
+    }
+  }
 }
 
 resource "oci_devops_build_pipeline_stage" "mushop_helm" {
@@ -337,12 +355,15 @@ resource "oci_devops_deploy_stage" "mushop_setup_stage" {
       id = oci_devops_deploy_pipeline.mushop_deploy_pipeline.id
     }
   }
-  deploy_stage_type                 = "OKE_HELM_CHART_DEPLOYMENT"
-  helm_chart_deploy_artifact_id     = oci_devops_deploy_artifact.mushop_setup_artifact.id
-  release_name                      = "mushop-utilities"
-  are_hooks_enabled                 = true
+  deploy_stage_type             = "OKE_HELM_CHART_DEPLOYMENT"
+  helm_chart_deploy_artifact_id = oci_devops_deploy_artifact.mushop_setup_artifact.id
+  release_name                  = "mushop-utilities"
+  are_hooks_enabled             = true
+  rollback_policy {
+    policy_type = "AUTOMATED_STAGE_ROLLBACK_POLICY"
+  }
   oke_cluster_deploy_environment_id = oci_devops_deploy_environment.mushop_env.id
-  namespace                         = "mushop"
+  namespace                         = "mushop-utilities"
 }
 
 resource "oci_devops_deploy_stage" "mushop_deploy" {
@@ -353,8 +374,12 @@ resource "oci_devops_deploy_stage" "mushop_deploy" {
       id = oci_devops_deploy_stage.mushop_setup_stage.id
     }
   }
+  rollback_policy {
+    policy_type = "AUTOMATED_STAGE_ROLLBACK_POLICY"
+  }
   deploy_stage_type                 = "OKE_HELM_CHART_DEPLOYMENT"
   helm_chart_deploy_artifact_id     = oci_devops_deploy_artifact.mushop_deploy_artifact.id
+  values_artifact_ids               = [oci_devops_deploy_artifact.mushop_values_artifact.id]
   release_name                      = "mushop"
   oke_cluster_deploy_environment_id = oci_devops_deploy_environment.mushop_env.id
   namespace                         = "mushop"
