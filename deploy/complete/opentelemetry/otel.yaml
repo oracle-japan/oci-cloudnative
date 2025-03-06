@@ -23,9 +23,12 @@ spec:
       # - name: OTEL_EXPORTER_OTLP_TRACES_HEADERS
       #   value: Authorization=dataKey RNAS5K65TUXXXXXXXXKOYBC4DSCZF
       - name: OTEL_com_oracle_apm_agent_data_upload_endpoint
-        value: https://aaaadfxxxxxxxxaaaaac57y.apm-agt.us-sanjose-1.oci.oraclecloud.com
+        value: https://aaaadfjcehb42aaaaaaaaacxom.apm-agt.ap-sydney-1.oci.oraclecloud.com
       - name: OTEL_com_oracle_apm_agent_private_data_key
-        value: RNAS5K65TUXXXXXXXXKOYBC4DSCZF
-
+        value: G2BRRIMZ4KZLVU6NOS7YIONYRWR2YFG5
+      - name: OTEL_com_oracle_apm_agent_config_trace_jvmargs_createChildSpans
+        value: "false"
+      - name: OTEL_com_oracle_apm_agent_config_trace_jvmargs_createSpan
+        value: "false"
 
         
