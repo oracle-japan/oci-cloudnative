@@ -68,6 +68,8 @@ spec:
               value: {{ .Values.env.zipkin }}
             - name: JAVA_OPTS
               value: {{ .Values.env.javaOpts }}
+            - name: com_oracle_apm_agent_sampling_file
+              value: "/app/Sampling.acml"
             {{- include "orders.oadb.connection" . | nindent 12 }}
           volumeMounts:
             - mountPath: /tmp

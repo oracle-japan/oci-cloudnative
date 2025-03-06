@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y procps
 
 # copy the generated application distribution
 COPY --from=appbuild /usr/src/app/build/libs/orders-0.0.1-SNAPSHOT.jar /app/orders-0.0.1-SNAPSHOT.jar
+COPY  Sampling.acml /app/Sampling.acml
 
 EXPOSE 80
 WORKDIR /app

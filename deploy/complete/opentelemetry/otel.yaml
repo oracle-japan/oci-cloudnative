@@ -30,5 +30,5 @@ spec:
         value: "false"
       - name: OTEL_com_oracle_apm_agent_config_trace_jvmargs_createSpan
         value: "false"
-
+        
         

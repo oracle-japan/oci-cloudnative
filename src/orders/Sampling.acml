@@ -1,0 +1,9 @@
+sampling_config:
+  -
+     operation_priority:
+       - name: "/actuator/health/readiness"
+         rule: constant
+         param: 0
+       - name: "/actuator/health/liveness"
+         rule: constant
+         param: 0
