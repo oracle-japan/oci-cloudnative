@@ -45,8 +45,9 @@ dependencies {
   implementation 'org.apache.kafka:kafka-clients'
   implementation 'org.hibernate:hibernate-core:6.6.4.Final'
   implementation 'com.h2database:h2:2.2.224'
+  implementation 'com.oracle.database.jdbc:ojdbc17:23.7.0.25.01'
+  implementation 'com.oracle.database.security:oraclepki:23.7.0.25.01'
   runtimeOnly 'io.opentelemetry.instrumentation:opentelemetry-spring-kafka-2.7:2.0.0-alpha'
-  runtimeOnly 'com.oracle.database.jdbc:ojdbc8:19.6.0.0'
   runtimeOnly 'io.micrometer:micrometer-registry-prometheus'
 
   testImplementation('org.springframework.boot:spring-boot-starter-test') {
