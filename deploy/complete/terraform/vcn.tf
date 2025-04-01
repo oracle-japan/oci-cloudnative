@@ -128,6 +128,16 @@ resource "oci_core_security_list" "mushop_security_list" {
       min = "6379"
     }
   }
+  ingress_security_rules {
+    protocol    = local.protocol.tcp
+    source      = "0.0.0.0/0"
+    source_type = "CIDR_BLOCK"
+    stateless   = "false"
+    tcp_options {
+      max = "1522"
+      min = "1522"
+    }
+  }
   egress_security_rules {
     protocol         = local.protocol.tcp
     destination      = local.all_services.cidr_block
