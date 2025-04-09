@@ -38,6 +38,10 @@ assets:
 
 carts:
   enabled: true
+  image:
+    repository: ocir.${REGION}.oci.oraclecloud.com/${NAMESPACE}/mushop-carts
+    tag: ${VERSION}
+    pullPolicy: Always
   opentelemetry:
     provider: oci
 
