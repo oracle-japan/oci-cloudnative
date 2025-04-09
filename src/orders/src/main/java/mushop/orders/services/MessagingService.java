@@ -7,15 +7,12 @@ package mushop.orders.services;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.micrometer.core.instrument.MeterRegistry;
-import io.opentelemetry.api.GlobalOpenTelemetry;
-import io.opentelemetry.api.trace.Span;
-import io.opentelemetry.api.trace.Tracer;
 import mushop.orders.repositories.CustomerOrderRepository;
 import mushop.orders.values.OrderUpdate;
 
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -39,7 +36,7 @@ public class MessagingService {
     @Autowired
     private KafkaTemplate<String, String> kafkaTemplate;
     
-    private final Logger log = LoggerFactory.getLogger(getClass());
+    private final Logger log = System.getLogger(MessagingService.class.getName());
     private final String ordersTopicName;
     private final String shipmentsTopicName;
     private ExecutorService messageProcessingPool;
@@ -55,7 +52,7 @@ public class MessagingService {
 
     @PostConstruct
     public void init() {
-        log.info("Initialized Kafka messaging service with topics: orders={}, shipments={}", 
+        log.log(Level.INFO, "Initialized Kafka messaging service with topics: orders={}, shipments={}", 
                 ordersTopicName, shipmentsTopicName);
     }
 
@@ -71,17 +68,17 @@ public class MessagingService {
         kafkaTemplate.send(record)
             .whenComplete((result, ex) -> {
                 if (ex == null) {
-                    log.info("Message sent successfully to topic {} with offset {}", 
+                    log.log(Level.INFO,"Message sent successfully to topic {} with offset {}", 
                         ordersTopicName, result.getRecordMetadata().offset());
                     ProducerRecord<String, String> sentRecord = result.getProducerRecord();
-                    log.info("Message sent successfully. Headers after send: ");
+                    log.log(Level.INFO,"Message sent successfully. Headers after send: ");
                     sentRecord.headers().forEach(header -> {
-                        log.info("  {} : {}", 
+                        log.log(Level.INFO,"  {} : {}", 
                             header.key(), 
                             new String(header.value(), StandardCharsets.UTF_8));
                     });
                 } else {
-                    log.error("Unable to send message to topic {}: {}", 
+                    log.log(Level.ERROR, "Unable to send message to topic {}: {}", 
                         ordersTopicName, ex.getMessage());
                 }
             });
@@ -94,14 +91,14 @@ public class MessagingService {
                 final OrderUpdate update = objectMapper.readValue(message, OrderUpdate.class);
                 customerOrderRepository.findById(update.getOrderId())
                     .ifPresent(order -> {
-                        log.debug("Updating order {}", order.getId());
+                        log.log(Level.DEBUG, "Updating order {}", order.getId());
                         order.setShipment(update.getShipment());
                         customerOrderRepository.save(order);
-                        log.info("order {} is now {}", order.getId(), update.getShipment().getName());
+                        log.log(Level.INFO, "order {} is now {}", order.getId(), update.getShipment().getName());
                         meterRegistry.counter("orders.fulfillment_ack").increment();
                     });
             } catch (IOException e) {
-                log.error("Failed reading shipping message", e);
+                 log.log(Level.ERROR, "Failed reading shipping message", e);
             }
         });
     }

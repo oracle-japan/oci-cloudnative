@@ -23,8 +23,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.common.config.SaslConfigs;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.apache.kafka.common.serialization.StringSerializer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -42,7 +42,7 @@ import jakarta.inject.Singleton;
 @Introspected
 public class FulfillmentService {
 
-    private static final Logger log = LoggerFactory.getLogger(FulfillmentService.class);
+    private static final Logger log = System.getLogger(FulfillmentService.class.getName());
     private final ObjectMapper objectMapper = new ObjectMapper();
     
     private final KafkaProducer<String, String> producer;
@@ -61,7 +61,7 @@ public class FulfillmentService {
     private Long simulationDelay;
 
     public FulfillmentService(MeterRegistry meterRegistry) {
-        log.info("FulfillmentService constructor called");  
+        log.log(Level.INFO, "FulfillmentService constructor called");  
         messageProcessingPool = Executors.newCachedThreadPool();
         this.meterRegistry = meterRegistry;
 
@@ -92,24 +92,24 @@ public class FulfillmentService {
 
     @PostConstruct
     void init() {
-        log.info("PostConstruct init() called");
-        log.info("ServiceReadyEvent received. Orders subject: {}", mushopOrdersSubject);
+        log.log(Level.INFO, "PostConstruct init() called");
+        log.log(Level.INFO, "ServiceReadyEvent received. Orders subject: {}", mushopOrdersSubject);
         this.consumer = new KafkaConsumer<>(consumerProps);
 
         Thread consumerThread = new Thread(() -> {
             try {
-                log.info("Subscribing to topic {}", mushopOrdersSubject);
+                log.log(Level.INFO, "Subscribing to topic {}", mushopOrdersSubject);
                 consumer.subscribe(Collections.singletonList(mushopOrdersSubject));
 
                 while (!Thread.currentThread().isInterrupted()) {
                     ConsumerRecords<String, String> records = consumer.poll(Duration.ofMillis(100));
                     for (ConsumerRecord<String, String> record : records) {
                         try {
-                            log.info("Message received. Topic: {}, Partition: {}, Offset: {}", 
+                            log.log(Level.INFO, "Message received. Topic: {}, Partition: {}, Offset: {}", 
                             record.topic(), record.partition(), record.offset());
-                            log.info("Headers:");
+                            log.log(Level.INFO, "Headers:");
                             record.headers().forEach(header -> {
-                                log.info("  {} : {}", 
+                                log.log(Level.INFO, "  {} : {}", 
                                     header.key(), 
                                     new String(header.value(), StandardCharsets.UTF_8));
                             });
@@ -117,12 +117,12 @@ public class FulfillmentService {
                             meterRegistry.counter("orders.received", "app", "fulfillment").increment();
                             fulfillOrder(update);
                         } catch (Exception e) {
-                            log.error("Error processing message", e);
+                            log.log(Level.ERROR, "Error processing message", e);
                         }
                     }
                 }
             } catch (Exception e) {
-                log.error("Fatal error in consumer loop", e);
+                log.log(Level.ERROR, "Fatal error in consumer loop", e);
             } finally {
                 consumer.close();
             }
@@ -130,12 +130,12 @@ public class FulfillmentService {
         
         consumerThread.setDaemon(true);
         consumerThread.start();
-        log.info("Started Kafka consumer for topic {}", mushopOrdersSubject);
+        log.log(Level.INFO, "Started Kafka consumer for topic {}", mushopOrdersSubject);
     }
 
     private OrderUpdate handleMessage(ConsumerRecord<String, String> record) throws Exception {
         OrderUpdate update = objectMapper.readValue(record.value(), OrderUpdate.class);
-        log.info("Got message {} on the mushop orders subject", update);
+        log.log(Level.INFO, "Got message {} on the mushop orders subject", update);
         return update;
     }
 
@@ -146,14 +146,14 @@ public class FulfillmentService {
                 Shipment shipment = new Shipment(UUID.randomUUID().toString(), "Shipped");
                 order.setShipment(shipment);
                 String msg = objectMapper.writeValueAsString(order);
-                log.info("Sending shipment update {}", msg);
+                log.log(Level.INFO, "Sending shipment update {}", msg);
                 
                 producer.send(new ProducerRecord<>(mushopShipmentsSubject, msg))
                     .get();  // Ensure the message is sent
                     
                 meterRegistry.counter("orders.fulfilled", "app", "fulfillment").increment();
             } catch (Exception e) {
-                log.error("Error fulfilling order", e);
+                log.log(Level.ERROR, "Error fulfilling order", e);
             }
         });
     }

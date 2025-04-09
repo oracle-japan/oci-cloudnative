@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<properties>
+    <property>
+        <name>javax.xml.parsers.SAXParserFactory</name>
+        <value>com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl</value>
+    </property>
+    <property>
+        <name>javax.xml.parsers.DocumentBuilderFactory</name>
+        <value>com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl</value>
+    </property>
+    <property>
+        <name>jdk.xml.enableTemplating</name>
+        <value>false</value>
+    </property>
+    <property>
+        <name>javax.xml.accessExternalDTD</name>
+        <value>false</value>
+    </property>
+</properties>

@@ -42,6 +42,16 @@ steps:
           echo "Failured build"
         runAs: root
   - type: Command
+    name: "Container Image Build carts"
+    shell: /bin/sh
+    command: |
+      docker image build -t mushop-carts ./src/carts/
+    onFailure:
+      - type: Command
+        command: |
+          echo "Failured build"
+        runAs: root
+  - type: Command
     name: "Container Image Build storefront"
     shell: /bin/sh
     command: |
@@ -123,6 +133,9 @@ outputArtifacts:
   - name: mushop-storefront
     type: DOCKER_IMAGE
     location: mushop-storefront
+  - name: mushop-carts
+    type: DOCKER_IMAGE
+    location: mushop-carts
   - name: values
     type: BINARY
     location: deploy/complete/helm-chart/mushop/values.yaml

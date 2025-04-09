@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 public class OrdersController {
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
 
 
     @Autowired

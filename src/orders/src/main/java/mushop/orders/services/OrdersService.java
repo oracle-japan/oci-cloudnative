@@ -15,8 +15,8 @@ import mushop.orders.resources.NewOrderResource;
 import mushop.orders.values.OrderUpdate;
 import mushop.orders.values.PaymentRequest;
 import mushop.orders.values.PaymentResponse;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.lang.System.Logger;
+import java.lang.System.Logger.Level;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -33,7 +33,7 @@ import static mushop.orders.controllers.OrdersController.PaymentDeclinedExceptio
 @Service
 public class OrdersService {
 
-    private final Logger LOG = LoggerFactory.getLogger(getClass());
+    private final Logger log = System.getLogger(OrdersService.class.getName());
     @Autowired
     private OrdersConfigurationProperties config;
 
@@ -56,8 +56,8 @@ public class OrdersService {
 
 
     public CustomerOrder createNewOrder(NewOrderResource orderPayload) {
-        LOG.info("Creating order {}", orderPayload);
-        LOG.debug("Starting calls");
+        log.log(Level.INFO, "Creating order {}", orderPayload);
+        log.log(Level.INFO, "Starting calls");
         meterRegistry.counter("orders.placed").increment();
         try {
             Future<Address> addressFuture = asyncGetService.getObject(orderPayload.address,
@@ -72,7 +72,7 @@ public class OrdersService {
             Future<List<Item>> itemsFuture = asyncGetService.getDataList(orderPayload.items,
                     new ParameterizedTypeReference<List<Item>>() {
                     });
-            LOG.debug("End of calls.");
+            log.log(Level.DEBUG, "End of calls.");
 
             //Calculate total
             float amount = calculateTotal(itemsFuture.get(timeout, TimeUnit.SECONDS));
@@ -84,7 +84,7 @@ public class OrdersService {
                     customerFuture.get(timeout, TimeUnit.SECONDS),
                     amount);
 
-            LOG.info("Sending payment request: " + paymentRequest);
+            log.log(Level.INFO, "Sending payment request: " + paymentRequest);
             Future<PaymentResponse> paymentFuture = asyncGetService.postResource(
                     config.getPaymentUri(),
                     paymentRequest,
@@ -92,7 +92,7 @@ public class OrdersService {
                     });
             PaymentResponse paymentResponse = paymentFuture.get(timeout, TimeUnit.SECONDS);
             
-            LOG.info("Received payment response: " + paymentResponse);
+           log.log(Level.INFO, "Received payment response: " + paymentResponse);
             if (paymentResponse == null) {
                 meterRegistry.counter("orders.rejected","cause","payment_response_invalid").increment();
                 throw new PaymentDeclinedException("Unable to parse authorisation packet");
@@ -112,10 +112,10 @@ public class OrdersService {
                     null,
                     Calendar.getInstance().getTime(),
                     amount);
-            LOG.debug("Received data: " + order.toString());
+            log.log(Level.DEBUG, "Received data: " + order.toString());
 
             CustomerOrder savedOrder = customerOrderRepository.save(order);
-            LOG.debug("Saved order: " + savedOrder);
+            log.log(Level.DEBUG, "Saved order: " + savedOrder);
             meterRegistry.summary("orders.amount").record(amount);
             DistributionSummary.builder("order.stats")
                     .serviceLevelObjectives(10d,20d,30d,40d,50d,60d,70d,80d,90d,100d,110d)

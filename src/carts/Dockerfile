@@ -1,0 +1,36 @@
+##### Application Metadata
+ARG APPLICATION_NAME="carts"
+ARG VERSION="1.1.0-SNAPSHOT"
+
+# ------------
+# Stage 1 : Build the application using Maven
+# 
+FROM maven:3.9-eclipse-temurin-17 AS appbuild
+
+# Create source folder
+RUN mkdir -p /usr/src/app
+COPY pom.xml /usr/src/app/
+WORKDIR      /usr/src/app/
+RUN mvn dependency:go-offline -B
+
+COPY src     /usr/src/app/src
+RUN mvn package 
+
+# ------------
+# Stage 2 : Application container
+#
+FROM eclipse-temurin:17-jre
+ARG APPLICATION_NAME
+ARG VERSION
+ARG clientVersion
+
+COPY --from=appbuild /usr/src/app/target/${APPLICATION_NAME}.jar /app/${APPLICATION_NAME}-${VERSION}.jar
+COPY --from=appbuild /usr/src/app/target/libs /app/libs
+EXPOSE 80
+WORKDIR /app
+
+ENV APPLICATION_NAME=${APPLICATION_NAME}
+ENV VERSION=${VERSION}
+ENV TNS_ADMIN=/wallet/
+
+ENTRYPOINT java $JAVA_OPTS  -jar /app/${APPLICATION_NAME}-${VERSION}.jar

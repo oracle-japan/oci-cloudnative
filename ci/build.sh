@@ -19,6 +19,7 @@ DOCKERFILE_PATHS=(
     ["../src/orders"]="Dockerfile"
     ["../src/fulfillment"]="Dockerfile.jvm"
     ["../src/storefront"]="Dockerfile"
+    ["../src/carts"]="Dockerfile"
 )
 
 # ディレクトリの配列
@@ -27,6 +28,7 @@ DIRECTORIES=(
     "../src/orders"
     "../src/fulfillment"
     "../src/storefront"
+    "../src/carts"
 )
 
 # 現在のスクリプトのディレクトリを取得
