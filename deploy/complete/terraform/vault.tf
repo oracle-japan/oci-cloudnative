@@ -21,7 +21,7 @@
 #   secret_name = "OCI_REGISTRY_USERNAME"
 #   vault_id = oci_kms_vault.mushop_vault.id
 #   secret_content {
-#     content_type = "PLAIN_TEXT"
+#     content_type = "BASE64"
 #     content = var.oci_registry_username
 #   }
 # }
@@ -32,7 +32,7 @@
 #   secret_name = "OCI_REGISTRY_PASSWORD"
 #   vault_id = oci_kms_vault.mushop_vault.id
 #   secret_content {
-#     content_type = "PLAIN_TEXT"
+#     content_type = "BASE64"
 #     content = var.oci_registry_password
 #   }
 # }
