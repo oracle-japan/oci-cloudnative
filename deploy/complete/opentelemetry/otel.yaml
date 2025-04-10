@@ -22,6 +22,10 @@ spec:
       #   value: Authorization=dataKey RNAS5K65TUXXXXXXXXKOYBC4DSCZF
       # - name: OTEL_EXPORTER_OTLP_TRACES_HEADERS
       #   value: Authorization=dataKey RNAS5K65TUXXXXXXXXKOYBC4DSCZF
+      # - name: OTEL_METRICS_EXPORTER
+      #   value: none
+      # - name: OTEL_LOGS_EXPORTER
+      #   value: none
       - name: OTEL_com_oracle_apm_agent_data_upload_endpoint
         value: https://aaaadfjcehb42aaaaaaaaacxom.apm-agt.ap-sydney-1.oci.oraclecloud.com
       - name: OTEL_com_oracle_apm_agent_private_data_key
