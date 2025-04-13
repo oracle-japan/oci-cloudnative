@@ -17,22 +17,22 @@
 
 # resource "oci_vault_secret" "mushop_oci_registry_user" {
 #   compartment_id = var.compartment_ocid
-#   key_id = oci_kms_key.mushop_key.id
-#   secret_name = "OCI_REGISTRY_USERNAME"
-#   vault_id = oci_kms_vault.mushop_vault.id
+#   key_id         = oci_kms_key.mushop_key.id
+#   secret_name    = "OCI_REGISTRY_USERNAME"
+#   vault_id       = oci_kms_vault.mushop_vault.id
 #   secret_content {
 #     content_type = "BASE64"
-#     content = var.oci_registry_username
+#     content      = base64encode(var.oci_registry_username)
 #   }
 # }
 
 # resource "oci_vault_secret" "mushop_oci_registry_password" {
 #   compartment_id = var.compartment_ocid
-#   key_id = oci_kms_key.mushop_key.id
-#   secret_name = "OCI_REGISTRY_PASSWORD"
-#   vault_id = oci_kms_vault.mushop_vault.id
+#   key_id         = oci_kms_key.mushop_key.id
+#   secret_name    = "OCI_REGISTRY_PASSWORD"
+#   vault_id       = oci_kms_vault.mushop_vault.id
 #   secret_content {
 #     content_type = "BASE64"
-#     content = var.oci_registry_password
+#     content      = base64encode(var.oci_registry_password)
 #   }
 # }
