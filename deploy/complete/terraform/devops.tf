@@ -15,6 +15,12 @@ resource "oci_artifacts_container_repository" "mushop_orders_registry" {
   is_public      = true
 }
 
+resource "oci_artifacts_container_repository" "mushop_carts_registry" {
+  compartment_id = var.compartment_ocid
+  display_name   = "mushop-carts"
+  is_public      = true
+}
+
 resource "oci_artifacts_container_repository" "mushop_api_registry" {
   compartment_id = var.compartment_ocid
   display_name   = "mushop-api"
@@ -75,6 +81,21 @@ resource "oci_devops_deploy_artifact" "mushop_orders_artifact" {
     deploy_artifact_source_type = "OCIR"
     image_uri = format(
       "ocir.%s.oci.oraclecloud.com/%s/mushop-orders:$${VERSION}",
+      var.region,
+      local.namespace
+    )
+  }
+}
+
+resource "oci_devops_deploy_artifact" "mushop_carts_artifact" {
+  project_id                 = oci_devops_project.mushop_devops_project.id
+  display_name               = "mushop-carts"
+  argument_substitution_mode = "SUBSTITUTE_PLACEHOLDERS"
+  deploy_artifact_type       = "DOCKER_IMAGE"
+  deploy_artifact_source {
+    deploy_artifact_source_type = "OCIR"
+    image_uri = format(
+      "ocir.%s.oci.oraclecloud.com/%s/mushop-carts:$${VERSION}",
       var.region,
       local.namespace
     )
@@ -197,6 +218,19 @@ resource "oci_devops_deploy_artifact" "mushop_orders_values_artifact" {
   }
 }
 
+resource "oci_devops_deploy_artifact" "mushop_carts_values_artifact" {
+  project_id                 = oci_devops_project.mushop_devops_project.id
+  display_name               = "mushop-carts-values"
+  argument_substitution_mode = "SUBSTITUTE_PLACEHOLDERS"
+  deploy_artifact_type       = "GENERIC_FILE"
+  deploy_artifact_source {
+    deploy_artifact_source_type = "GENERIC_ARTIFACT"
+    deploy_artifact_version     = "$${VERSION}"
+    deploy_artifact_path        = "mushop-carts"
+    repository_id               = oci_artifacts_repository.mushop_helm_artifact.id
+  }
+}
+
 resource "oci_devops_deploy_artifact" "mushop_fulfillment_values_artifact" {
   project_id                 = oci_devops_project.mushop_devops_project.id
   display_name               = "mushop-fulfillment-values"
@@ -296,6 +330,10 @@ resource "oci_devops_build_pipeline_stage" "mushop_stack_ship" {
     items {
       artifact_name = "mushop-orders"
       artifact_id   = oci_devops_deploy_artifact.mushop_orders_artifact.id
+    }
+    items {
+      artifact_name = "mushop-carts"
+      artifact_id   = oci_devops_deploy_artifact.mushop_carts_artifact.id
     }
     items {
       artifact_name = "mushop-fulfillment"
