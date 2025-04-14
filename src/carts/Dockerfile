@@ -25,7 +25,7 @@ ARG APPLICATION_NAME
 ARG VERSION
 ARG clientVersion
 
-COPY --from=appbuild /usr/src/app/target/app.jar /app/${APPLICATION_NAME}-${VERSION}.jar
+COPY --from=appbuild /usr/src/app/target/${APPLICATION_NAME}.jar /app/${APPLICATION_NAME}-${VERSION}.jar
 COPY --from=appbuild /usr/src/app/target/libs /app/libs
 EXPOSE 80
 WORKDIR /app
