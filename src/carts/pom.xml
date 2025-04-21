@@ -89,10 +89,6 @@
             <version>2.14.0-alpha</version>
         </dependency>
         <dependency>
-            <groupId>io.helidon.logging</groupId>
-            <artifactId>helidon-logging-slf4j</artifactId>
-        </dependency>
-        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jul-to-slf4j</artifactId>
         </dependency>
