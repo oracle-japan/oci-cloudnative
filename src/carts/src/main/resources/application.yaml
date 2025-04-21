@@ -1,28 +1,11 @@
-javax:
-  xml:
-    parsers:
-      SAXParserFactory: com.sun.org.apache.xerces.internal.jaxp.SAXParserFactoryImpl
-      DocumentBuilderFactory: com.sun.org.apache.xerces.internal.jaxp.DocumentBuilderFactoryImpl
-      security:
-        disallow-dtd: true
-        external-general-entities: false
-        external-parameter-entities: false
-        secure-processing: true
 
-mock: false
+# The name of the JSON document collection to store the carts in. 
+OADB_CARTS_COLLECTION: cart
+
+# The autonomous database service name (or "Mock" for in-memory without a database)
+OADB_SERVICE: mock
 
 server:
   port: 80
-  host: 0.0.0.0
   access-log:
     format: "%h %l %u %t %r %s %b %{Referer}i"
-
-# Application configuration
-app:
-  greeting: Hello from Helidon Carts Service
-
-# Metrics configuration
-metrics:
-  enabled: true
-  web-context: /metrics
-

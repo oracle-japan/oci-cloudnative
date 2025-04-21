@@ -1,43 +1,60 @@
 package mushop.carts;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import io.helidon.config.Config;
+import io.helidon.health.HealthSupport;
+import io.helidon.health.checks.HealthChecks;
+import io.helidon.media.jsonb.JsonbSupport;
+import io.helidon.metrics.MetricsSupport;
+import io.helidon.webserver.Routing;
+import io.helidon.webserver.WebServer;
+import io.helidon.webserver.accesslog.AccessLogSupport;
 import org.eclipse.microprofile.health.HealthCheck;
 import org.eclipse.microprofile.health.HealthCheckResponse;
-import org.eclipse.microprofile.health.Liveness;
 
-import io.helidon.microprofile.server.Server;
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.enterprise.inject.spi.CDI;
-import jakarta.ws.rs.ApplicationPath;
-import jakarta.ws.rs.core.Application;
-
-@ApplicationScoped
-@ApplicationPath("")
-public class Main extends Application {
-
-    @Override
-    public Set<Class<?>> getClasses() {
-        Set<Class<?>> classes = new HashSet<>();
-        classes.add(CartService.class);
-        classes.add(org.glassfish.jersey.jsonb.JsonBindingFeature.class);
-        return classes;
+public class Main {
+        
+    private Main() {
+        // singleton
+    }
+    
+    public static void main(String[] args) {
+        WebServer server = createWebServer();
+        server.start().thenAccept(ws -> {
+            System.out.println("Running on port " + ws.port());
+            ws.whenShutdown().thenRun(() -> System.out.println("Server stopped."));
+        }).exceptionally(t -> {
+            System.err.println("Startup failed: " + t.getMessage());
+            t.printStackTrace(System.err);
+            return null;
+        });
     }
 
-    public static void main(final String[] args) {
-        Server server = Server.builder()
-                .addApplication(Main.class)
-                .build();
-        server.start();
-    }
+    public static WebServer createWebServer() {
+        Config config = Config.create();
 
-    @Liveness
-    public HealthCheck dbHealth() {
-        CartService cartService = CDI.current().select(CartService.class).get();
-        return () -> HealthCheckResponse
+        CartService cartService = new CartService(config);
+
+        HealthCheck dbHealth = () -> HealthCheckResponse
                 .named("dbHealth")
-                .status(cartService.healthCheck())
+                .state(cartService.healthCheck())
+                .build();
+        
+        HealthSupport health = HealthSupport.builder()
+                .addLiveness(HealthChecks.healthChecks())
+                .addLiveness(dbHealth)
+                .build();
+        
+        Routing routing = Routing.builder()
+                      .register(AccessLogSupport.create(config.get("server.access-log")))
+                      .register(MetricsSupport.create())
+                      .register(health)                     // "/health"
+                      .register("/carts", cartService)
+                      .build();
+        
+        return WebServer.builder(routing)
+                .config(config.get("server"))
+                .addMediaSupport(JsonbSupport.create())
                 .build();
     }
+
 }

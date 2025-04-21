@@ -1,180 +1,246 @@
 package mushop.carts;
 
+import io.helidon.common.http.Http;
+import io.helidon.common.http.Http.RequestMethod;
+import io.helidon.config.Config;
+import io.helidon.metrics.RegistryFactory;
+import io.helidon.webserver.Routing.Rules;
+import io.helidon.webserver.ServerRequest;
+import io.helidon.webserver.ServerResponse;
+import io.helidon.webserver.Service;
+import org.eclipse.microprofile.metrics.Counter;
+import org.eclipse.microprofile.metrics.Meter;
+import org.eclipse.microprofile.metrics.MetricRegistry;
+import org.eclipse.microprofile.metrics.Timer;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.lang.System.Logger;
 import java.lang.System.Logger.Level;
 
-import org.eclipse.microprofile.metrics.Counter;
-import org.eclipse.microprofile.metrics.Meter;
-import org.eclipse.microprofile.metrics.Timer;
-import org.eclipse.microprofile.metrics.annotation.Metric;
+public class CartService implements Service {
 
-import jakarta.enterprise.context.ApplicationScoped;
-import jakarta.inject.Inject;
-import jakarta.inject.Named;
-import jakarta.json.Json;
-import jakarta.ws.rs.Consumes;
-import jakarta.ws.rs.DELETE;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.PATCH;
-import jakarta.ws.rs.POST;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.PathParam;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+    /**
+     * A reserved dbname to use for an in-memory repository instead of the
+     * autonomous database
+     */
+    private static final String MOCKDB = "mock";
 
-@Path("carts")
-@ApplicationScoped
-@Produces(MediaType.APPLICATION_JSON)
-@Consumes(MediaType.APPLICATION_JSON)
-public class CartService {
+    private static final Logger log = System.getLogger(CartService.class.getName());
 
-    private final static Logger log = System.getLogger(CartService.class.getName());
+    /** @see https://github.com/oracle/helidon/issues/1172 */
+    private static final Set<RequestMethod> PATCH = Collections.singleton(Http.RequestMethod.create("PATCH"));
 
-    @Inject
-    @Named("database")
     private CartRepository carts;
 
-    @Inject
-    @Metric(name = "carts_create_meter")
-    private Meter newCartMeter;
+    private final MetricRegistry registry = RegistryFactory.getInstance().getRegistry(MetricRegistry.Type.APPLICATION);
+    private final Meter newCartMeter = registry.meter("carts_create_meter");
+    private final Meter updateCartMeter = registry.meter("carts_update_meter");
+    private final Counter deleteCartCounter = registry.counter("carts_delete");
+    private final Timer saveCartTimer = registry.timer("carts_save_timer");
+    private final Timer dbConnectTimer = registry.timer("carts_db_conn_timer");
 
-    @Inject
-    @Metric(name = "carts_update_meter")
-    private Meter updateCartMeter;
+    public CartService(Config config) {
+        ExecutorService executorService = Executors.newSingleThreadExecutor();
+        Boolean connected = false;
+        String dbName = config.get("OADB_SERVICE").asString().get();
+        if (MOCKDB.equalsIgnoreCase(dbName)) {
+            log.log(Level.WARNING, "Connecting to a Mock Database. Data is not persisted.");
+            carts = new CartRepositoryMemoryImpl();
+        } else {
+            while (!connected) {
+                try {
+                    Future<Boolean> result = executorService.submit(() -> {
+                        try {
+                            log.log(Level.INFO, "Connecting to " + dbName);
+                            Timer.Context context = dbConnectTimer.time();
+                            carts = new CartRepositoryDatabaseImpl(config);
+                            context.close();
+                            log.log(Level.INFO, "Connected to " + dbName);
+                            return Boolean.TRUE;
+                        } catch (Exception ex) {
+                            log.log(Level.WARNING, "Connect failed. Retrying.");
+                            log.log(Level.ERROR, ex.getMessage(), ex);
+                            Thread.sleep(5000l);
+                            return Boolean.FALSE;
+                        }
 
-    @Inject
-    @Metric(name = "carts_delete")
-    private Counter deleteCartCounter;
+                    });
+                    connected = result.get();
+                } catch (Exception e) {
+                    log.log(Level.ERROR, e.getMessage(), e);
+                }
 
-    @Inject
-    @Metric(name = "carts_save_timer")
-    private Timer saveCartTimer;
+            }
+
+        }
+    }
+
+    @Override
+    public void update(Rules rules) {
+        rules.get("/{cartId}/items", this::getCartItems).delete("/{cartId}", this::deleteCart)
+                .delete("/{cartId}/items/{itemId}", this::deleteCartItem).post("/{cartId}", this::postCart)
+                .anyOf(PATCH, "/{cartId}/items", this::updateCartItem);
+    }
 
     /**
      * GET /{cartId}/items
+     * 
+     * Returns the list of items in a cart.
      */
-    @GET
-    @Path("/{cartId}/items")
-    public Response getCartItems(@PathParam("cartId") String cartId) {
+    public void getCartItems(ServerRequest request, ServerResponse response) {
+        Cart result = null;
         try {
-            Cart cart = carts.getById(cartId);
-            if (cart == null) {
-                return Response.status(Response.Status.NOT_FOUND).build();
+            String cartId = request.path().param("cartId");
+            result = carts.getById(cartId);
+            if (result == null) {
+                response.status(404).send();
+                return;
             }
-            log.log(Level.INFO, "carts: ", cart.getItems());
-            return Response.ok(cart.getItems()).build();
         } catch (Exception e) {
             log.log(Level.ERROR, "getCartItems failed.", e);
-            return createErrorResponse(e.getMessage());
+            sendError(response, e.getMessage());
+            return;
         }
+        response.status(200).send(result.getItems());
     }
 
     /**
      * DELETE /{cartId}
+     * 
+     * Delete a cart.
      */
-    @DELETE
-    @Path("/{cartId}")
-    public Response deleteCart(@PathParam("cartId") String cartId) {
+    public void deleteCart(ServerRequest request, ServerResponse response) {
         try {
-            if (carts.deleteCart(cartId)) {
+            if (carts.deleteCart(request.path().param("cartId"))) {
                 deleteCartCounter.inc();
-                return Response.ok().build();
+                response.status(200).send();
+            } else {
+                response.status(404).send();
             }
-            return Response.status(Response.Status.NOT_FOUND).build();
         } catch (Exception e) {
             log.log(Level.ERROR, "deleteCart failed.", e);
-            return createErrorResponse(e.getMessage());
+            sendError(response, e.getMessage());
+            return;
         }
     }
 
     /**
      * DELETE /{cartId}/items/{itemId}
+     * 
+     * Deletes item in a cart.
      */
-    @DELETE
-    @Path("/{cartId}/items/{itemId}")
-    public Response deleteCartItem(@PathParam("cartId") String cartId, @PathParam("itemId") String itemId) {
+    public void deleteCartItem(ServerRequest request, ServerResponse response) {
+
+        String cartId = request.path().param("cartId");
+        String itemId = request.path().param("itemId");
         try {
             Cart cart = carts.getById(cartId);
             if (cart == null || !cart.removeItem(itemId)) {
-                return Response.status(Response.Status.NOT_FOUND).build();
+                response.status(404).send();
+                return;
             }
-
-            try (Timer.Context context = saveCartTimer.time()) {
-                carts.save(cart);
-            }
+            Timer.Context context = saveCartTimer.time();
+            carts.save(cart);
+            context.close();
             updateCartMeter.mark();
-            return Response.ok().build();
+            response.status(200).send();
         } catch (Exception e) {
             log.log(Level.ERROR, "deleteCartItem failed.", e);
-            return createErrorResponse(e.getMessage());
+            sendError(response, e.getMessage());
+            return;
         }
     }
 
     /**
      * POST /{cartId}
+     * 
+     * Adds or updates a cart. If the cartId does not exist, a new cart is added. If
+     * the cartId does exist, the given cart is merged in to the existing one. This
+     * method is used to add additional items to a cart.
      */
-    @POST
-    @Path("/{cartId}")
-    public Response postCart(@PathParam("cartId") String cartId, Cart newCart) {
+    public void postCart(ServerRequest request, ServerResponse response) {
+        String cartId = request.path().param("cartId");
+
         try {
-            Cart cart = carts.getById(cartId);
-            if (cart == null) {
-                newCart.setId(cartId);
-                try (Timer.Context context = saveCartTimer.time()) {
-                    carts.save(newCart);
+            request.content().as(Cart.class).thenAccept(newCart -> {
+                try {
+                    Cart cart = carts.getById(cartId);
+                    if (cart == null) {
+                        newCart.setId(cartId);
+                        Timer.Context context = saveCartTimer.time();
+                        carts.save(newCart);
+                        context.close();
+                        newCartMeter.mark();
+                        response.status(201).send(); // created
+                    } else {
+                        cart.merge(newCart);
+                        Timer.Context context = saveCartTimer.time();
+                        carts.save(cart);
+                        context.close();
+                        updateCartMeter.mark();
+                        response.status(200).send(); // ok
+                    }
+                } catch (Exception e) {
+                    log.log(Level.ERROR, "postCart failed.", e);
+                    sendError(response, e.getMessage());
+                    return;
                 }
-                newCartMeter.mark();
-                return Response.status(Response.Status.CREATED).build();
-            } else {
-                cart.merge(newCart);
-                try (Timer.Context context = saveCartTimer.time()) {
-                    carts.save(cart);
-                }
-                updateCartMeter.mark();
-                return Response.ok().build();
-            }
+            });
         } catch (Exception e) {
             log.log(Level.ERROR, "postCart failed.", e);
-            return createErrorResponse(e.getMessage());
+            sendError(response, e.getMessage());
+            return;
         }
     }
 
     /**
-     * PATCH /{cartId}/items
+     * PUT /{cartId}/items
+     * 
+     * Updates the quantity of an item in the cart.
      */
-    @PATCH
-    @Path("/{cartId}/items")
-    public Response updateCartItem(@PathParam("cartId") String cartId, Item qItem) {
+    public void updateCartItem(ServerRequest request, ServerResponse response) {
+        String cartId = request.path().param("cartId");
         try {
-            Cart cart = carts.getById(cartId);
-            if (cart == null) {
-                return Response.status(Response.Status.NOT_FOUND).build();
-            }
-
-            for (Item item : cart.getItems()) {
-                if (item.getItemId().equals(qItem.getItemId())) {
-                    item.setQuantity(qItem.getQuantity());
-                    try (Timer.Context context = saveCartTimer.time()) {
-                        carts.save(cart);
+            request.content().as(Item.class).thenAccept(qItem -> {
+                try {
+                    Cart cart = carts.getById(cartId);
+                    if (cart == null) {
+                        response.status(404).send();
+                        return;
                     }
-                    updateCartMeter.mark();
-                    return Response.ok().build();
+                    for (Item item : cart.getItems()) {
+                        if (item.getItemId().equals(qItem.getItemId())) {
+                            item.setQuantity(qItem.getQuantity());
+                            Timer.Context context = saveCartTimer.time();
+                            carts.save(cart);
+                            context.close();
+                            updateCartMeter.mark();
+                            response.status(200).send();
+                            return;
+                        }
+                    }
+                    response.status(404).send();
+                } catch (Exception e) {
+                    sendError(response, e.getMessage());
+                    return;
                 }
-            }
-            return Response.status(Response.Status.NOT_FOUND).build();
+            });
         } catch (Exception e) {
             log.log(Level.ERROR, "updateCartItem failed.", e);
-            return createErrorResponse(e.getMessage());
+            sendError(response, e.getMessage());
+            return;
         }
     }
 
-    private Response createErrorResponse(String message) {
-        return Response.status(Response.Status.BAD_REQUEST)
-                      .entity(Json.createObjectBuilder()
-                             .add("errorMessage", message)
-                             .build())
-                      .build();
+    private void sendError(ServerResponse response, String message) {
+        HashMap<String, String> error = new HashMap<String, String>();
+        error.put("errorMessage", message);
+        response.status(400).send(error);
     }
 
     public boolean healthCheck() {

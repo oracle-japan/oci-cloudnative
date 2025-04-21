@@ -1,110 +1,157 @@
 package mushop.carts.test;
 
-import java.math.BigDecimal;
-
+import static java.net.HttpURLConnection.HTTP_CREATED;
+import static java.net.HttpURLConnection.HTTP_OK;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
+import java.math.BigDecimal;
+import java.net.HttpURLConnection;
+import java.net.InetAddress;
+import java.net.URL;
+import java.net.UnknownHostException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.stream.Collectors;
+
+import javax.json.Json;
+import javax.json.JsonArray;
+import javax.json.JsonObject;
+import javax.json.JsonReader;
+import javax.json.JsonValue;
+import javax.json.JsonWriter;
+import javax.json.bind.Jsonb;
+import javax.json.bind.JsonbBuilder;
+
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import io.helidon.microprofile.tests.junit5.HelidonTest;
-import jakarta.inject.Inject;
-import jakarta.json.JsonArray;
-import jakarta.json.JsonObject;
-import jakarta.ws.rs.client.Entity;
-import jakarta.ws.rs.client.WebTarget;
-import jakarta.ws.rs.core.MediaType;
-import jakarta.ws.rs.core.Response;
+import io.helidon.webserver.WebServer;
 import mushop.carts.Cart;
 import mushop.carts.Item;
+import mushop.carts.Main;
 
-@HelidonTest
 public class TestCartService {
     
-    @Inject
-    private WebTarget target;
-
+    WebServer server;
     
-    @Test
-    public void testMetricsJson() {
-        Response response = target.path("metrics")
-                                .request(MediaType.APPLICATION_JSON)
-                                .get();
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        JsonObject result = response.readEntity(JsonObject.class);
-        // MicroProfileの基本メトリクスがあることを確認
-        assertTrue(result.getJsonObject("base") != null);
-        response.close();
+    @BeforeEach
+    public void setUp() throws Exception {
+        server = Main.createWebServer();
+        server.start().toCompletableFuture().join();
     }
 
-    @Test
-    public void testMetricsText() {
-        Response response = target.path("metrics")
-                                .request(MediaType.TEXT_PLAIN)
-                                .get();
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        String result = response.readEntity(String.class);
-        // Prometheusフォーマットのメトリクスがあることを確認
-        assertTrue(result.contains("# TYPE base_"));
-        response.close();
-    }
-
-    @Test
-    public void testHealthCheck() {
-        Response response = target.path("health")
-                                .request(MediaType.APPLICATION_JSON)
-                                .get();
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        JsonObject result = response.readEntity(JsonObject.class);
-        assertEquals("UP", result.getString("status"));
-        response.close();
+    @AfterEach
+    public void tearDown() throws Exception {
+        server.shutdown().toCompletableFuture().join();
+        server = null;
     }
     
     @Test
-    public void testStoreCart() {
+    public void testMetricsJson() throws Exception {
+        JsonObject result = get(baseUrl() + "/metrics", "Accept: application/json").asJsonObject();
+
+        assertTrue(result.get("vendor").asJsonObject()
+                         .getInt("requests.count") > 0);
+        
+    }
+
+    @Test
+    public void testHealthCheck() throws Exception {
+        JsonValue result = get(baseUrl() + "/health");
+        assertEquals("UP", result.asJsonObject().getString("status"));
+    }
+    
+    @Test
+    public void testStoreCart() throws Exception {
         Item i = new Item();
         i.setUnitPrice(BigDecimal.valueOf(123));
         i.setQuantity(47);
         i.setItemId("I123");
         
         Cart c = new Cart();
-        c.setId("cart1");          // カートIDを明示的に設定
         c.setCustomerId("c1");
         c.getItems().add(i);
+        
+        Jsonb jsonb = JsonbBuilder.create();
+        JsonObject cValue = parse(jsonb.toJson(c)).asJsonObject();
+        int res = post(baseUrl() + "/carts/" + c.getId(), cValue);
+        assertEquals(HTTP_CREATED, res);
+        
+        JsonArray arr = get(baseUrl() + "/carts/" + c.getId()  + "/items").asJsonArray();
+        JsonValue iValue = arr.get(0);
+        assertEquals(cValue.get("items").asJsonArray().get(0), iValue);
+        
+        res = delete(baseUrl() + "/carts/" + c.getId() + "/items/" + i.getItemId());
+        assertEquals(HTTP_OK, res);
+        
+        arr =  get(baseUrl() + "/carts/" + c.getId()  + "/items").asJsonArray();
+        assertEquals(0, arr.size());
+    }
+    
+    
+    private JsonValue parse(String json) {
+        JsonReader reader = Json.createReader(new StringReader(json));
+        JsonValue result = reader.readValue();
+        reader.close();
+        return result;
+    }
 
-        String cartPath = c.getId();
-        String itemsPath = cartPath + "/items";
+    private int post(String urlStr, JsonValue body) throws Exception {
+        URL url = new URL(urlStr);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("POST");
+        con.setRequestProperty("Content-Type", "application/json");
+        con.setDoOutput(true);
+        try (JsonWriter writer = Json.createWriter(con.getOutputStream())) {
+            writer.write(body);
+        }
+        return con.getResponseCode();
+    }
+    
+    private int delete(String urlStr) throws Exception {
+        URL url = new URL(urlStr);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("DELETE");
+        return con.getResponseCode();
+    }
+    
+    private JsonValue get(String urlStr, String... headers) throws IOException {
+        URL url = new URL(urlStr);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        for (String header : headers) {
+            String[] kv = header.split(":");
+            con.setRequestProperty(kv[0], kv[1]);
+        }
+        try (JsonReader reader = Json.createReader(con.getInputStream())) {
+            return reader.readValue();
+        }
+    }
 
-        // Create cart
-        Response response = target.path("carts").path(cartPath)
-                                .request(MediaType.APPLICATION_JSON)
-                                .post(Entity.json(c));
-        assertEquals(Response.Status.CREATED.getStatusCode(), response.getStatus());
-        response.close();
-
-        // Get items
-        response = target.path("carts").path(cartPath + "/items")
-                        .request(MediaType.APPLICATION_JSON)
-                        .get();
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        JsonArray items = response.readEntity(JsonArray.class);
-        assertEquals(1, items.size());
-        assertEquals(i.getItemId(), items.getJsonObject(0).getString("itemId"));
-        response.close();
-
-        // Delete item
-        response = target.path("carts").path(cartPath + "/items/" + i.getItemId())
-                        .request()
-                        .delete();
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        response.close();
-
-        // Verify item was deleted
-        response = target.path("carts").path(cartPath + "/items")
-                        .request(MediaType.APPLICATION_JSON)
-                        .get();
-        assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
-        items = response.readEntity(JsonArray.class);
-        assertEquals(0, items.size());
-        response.close();
+    private String getPlainText(String urlStr, String... headers) throws IOException {
+        URL url = new URL(urlStr);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
+        for (String header : headers) {
+            String[] kv = header.split(":");
+            con.setRequestProperty(kv[0], kv[1]);
+        }
+        con.setRequestProperty("Accept", "text/plain");
+        String text = new BufferedReader(
+                new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8)).lines()
+                .collect(Collectors.joining("\n"));
+        return text;
+    }
+    
+    private String baseUrl() throws UnknownHostException {
+        InetAddress host = InetAddress.getLocalHost();
+        return "http://" + host.getHostName() + 
+                ":" + server.port();
     }
 }
