@@ -1,8 +1,10 @@
 #!/bin/sh
-#Get CompartmentID
-oci iam compartment list | grep compartment-id | head -n 1 > compartment-id.txt ; cut -f 2 -d ":" compartment-id.txt | tr -d ' ','"',',' | tee compartment-id-tee.txt &>/dev/null ; compartment_id=`cat ./compartment-id-tee.txt` ; rm -rf ./compartment-id* ; echo ${compartment_id}
 
-#Create Dynamic-Group
+# Get CompartmentID
+compartment_id=$(oci iam compartment list --include-root --query "data[*].id" --raw-output | sed '/^\[/d;/^\]/d;s/^[[:space:]]*//;s/"//g')
+echo "Compartment ID: ${compartment_id}"
+
+# Create Dynamic-Group
 oci iam dynamic-group create --name OCI_Logging_Dynamic_Group --description OCI_Logging_Dynamic_Group --matching-rule "any {instance.compartment.id = '${compartment_id}'}"
 
 #Create Policy
