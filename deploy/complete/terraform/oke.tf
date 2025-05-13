@@ -45,7 +45,7 @@ resource "oci_containerengine_node_pool" "mushop_node_pool" {
   cluster_id         = oci_containerengine_cluster.mushop_oke.id
   compartment_id     = var.compartment_ocid
   name               = "mushop-node-pool"
-  node_shape         = local.node_pool_node_shape
+  node_shape         = "VM.Standard.E5.Flex"
   kubernetes_version = reverse(sort(data.oci_containerengine_cluster_option.cluster_option.kubernetes_versions))[0]
   node_config_details {
     placement_configs {
