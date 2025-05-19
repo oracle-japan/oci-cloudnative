@@ -20,6 +20,7 @@ resource "oci_identity_policy" "mushop_policy" {
     format("allow dynamic-group %s to manage all-artifacts in tenancy", oci_identity_dynamic_group.mushop_dynamic_group.name),
     format("allow dynamic-group %s to use ons-topics in tenancy", oci_identity_dynamic_group.mushop_dynamic_group.name),
     format("allow dynamic-group %s to manage cluster-family in tenancy", oci_identity_dynamic_group.mushop_dynamic_group.name),
-    format("allow dynamic-group %s to use functions-family in tenancy", oci_identity_dynamic_group.mushop_dynamic_group.name)
+    format("allow dynamic-group %s to use functions-family in tenancy", oci_identity_dynamic_group.mushop_dynamic_group.name),
+    format("allow dynamic-group %s to use secret-family in tenancy", oci_identity_dynamic_group.mushop_dynamic_group.name)
   ]
 }
