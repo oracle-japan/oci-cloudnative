@@ -4,9 +4,14 @@ timeoutInSeconds: 10000
 runAs: root
 shell: bash
 env:
+# OCI Vault Use
   vaultVariables:
     OCI_REGISTRY_USERNAME: "OCI_REGISTRY_USERNAME_OCID"
     OCI_REGISTRY_PASSWORD: "OCI_REGISTRY_PASSWORD_OCID"
+# OCI Vault Not Use
+# variables:
+#    OCI_REGISTRY_USERNAME: "<your-object-storage-namespace>/<your-mail-address>"
+#    OCI_REGISTRY_PASSWORD: "<your-authentication-token>"
   exportedVariables:
     - VERSION
 
