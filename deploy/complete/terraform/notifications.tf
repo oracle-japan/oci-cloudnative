@@ -1,6 +1,6 @@
 resource "oci_ons_notification_topic" "mushop_topic" {
   compartment_id = var.compartment_ocid
-  name           = "myshop"
+  name           = "mushop"
 }
 
 resource "oci_ons_subscription" "mushop_subscription" {
